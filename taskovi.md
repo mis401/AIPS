@@ -1,5 +1,7 @@
 # Mihajlo
 - ~~model~~
+- povezivanje auth
+- CRUD
 
 # Kristina
 - ~~landing page~~
@@ -10,6 +12,7 @@
 - ~~signup~~
 - ~~signin~~
 - signout
+- routing
 
 
 
