@@ -1,0 +1,40 @@
+
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #e4e4e4;
+    background-image: url('../assets/images/home-background.png');
+    background-repeat: round;
+    padding: 50px;
+    font-family: serif;
+  }
+  
+  .join-us{
+    align-self: flex-end;
+    margin-top: -20px;
+    font-style: oblique;
+    font-size: larger;
+  }
+
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 50px;
+  }
+
+  .heading {
+    font-family: serif;
+    font-size: 4em;
+    margin-bottom: 20px;
+    color: #77abb7;
+  }
+  
+  .paragraph {
+    font-size: larger;
+    color: #e4e4e4;
+  }
+  
