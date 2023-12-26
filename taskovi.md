@@ -1,5 +1,5 @@
 # Mihajlo
-- model
+- ~~model~~
 
 # Kristina
 - landing page
