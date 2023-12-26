@@ -2,7 +2,7 @@
 - ~~model~~
 
 # Kristina
-- landing page
+- ~~landing page~~
 - kalendar
 
 # Andjelija
