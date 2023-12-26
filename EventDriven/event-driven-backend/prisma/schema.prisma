@@ -16,4 +16,118 @@ model User {
   hashedPassword String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+  communities Community[] @relation("memberOf")
+  createdCommunities Community[] @relation("createdUser")
+  documents Document[] @relation("createdBy")
+  subscribedTo Document[] @relation("subscriptions")
+  comments Comment[]
+  messages Message[]
+  role Role @default(USER)
+  managingCommunities Community[] @relation("managers")
+}
+
+model Community {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  members User[] @relation("memberOf")
+  createdUser User @relation("createdUser", fields: [createdUserId], references: [id])
+  createdUserId Int
+  calendar Calendar @relation("calendarOf", fields: [calendarId], references: [id])
+  calendarId Int @unique
+  messages Message[]
+  managers User[] @relation("managers")
+}
+
+model Calendar {
+  id       Int      @id @default(autoincrement())
+  name     String
+  community Community? @relation("calendarOf")
+  documents Document[]
+  event Event[]
+}
+
+model Document {
+  id       Int      @id @default(autoincrement())
+  name     String
+  path String
+  day DateTime
+  type DocumentType @default(DOCUMENT)
+  calendar Calendar @relation(fields: [calendarId], references: [id])
+  calendarId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  createdBy User @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int
+  subscribedUsers User[] @relation("subscriptions")
+  comments Comment[]
+  notifications Notification[]
+}
+
+model Event {
+  id       Int      @id @default(autoincrement())
+  name     String
+  start DateTime
+  end DateTime
+  color EventTheme @default(BLUE)
+  calendar Calendar @relation(fields: [calendarId], references: [id])
+  calendarId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Comment {
+  id       Int      @id @default(autoincrement())
+  text     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  createdBy User @relation(fields: [createdById], references: [id])
+  createdById Int
+  document Document @relation(fields: [documentId], references: [id])
+  documentId Int
+
+}
+
+model Notification{
+  id       Int      @id @default(autoincrement())
+  text     String
+  createdAt DateTime @default(now())
+  document Document @relation(fields: [documentId], references: [id])
+  documentId Int
+}
+
+
+model Message{
+  id       Int      @id @default(autoincrement())
+  text     String
+  createdAt DateTime @default(now())
+  sender User @relation(fields: [senderId], references: [id])
+  senderId Int
+  community Community @relation(fields: [communityId], references: [id])
+  communityId Int
+}
+
+
+enum Role {
+  USER
+  MANAGER
+}
+
+enum DocumentType {
+  WHITEBOARD
+  DOCUMENT
+  TODO
+}
+
+enum EventTheme {
+  RED
+  BLUE
+  GREEN
+  YELLOW
+  PURPLE
+  ORANGE
+  PINK
+  GREY
+  BLACK
+  WHITE
 }
