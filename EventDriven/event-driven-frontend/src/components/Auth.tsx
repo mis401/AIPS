@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);

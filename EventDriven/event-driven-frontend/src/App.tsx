@@ -4,7 +4,6 @@ import './App.css';
 import Welcome from './components/Welcome';
 import Auth from './components/Auth';
 import Home from './components/Home';
-import Calendar from './components/Calendar';
 
 function App() {
   return (
