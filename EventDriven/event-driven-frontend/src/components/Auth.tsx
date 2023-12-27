@@ -13,7 +13,7 @@ function Auth(){
         navigate('/home');
       };
     return(
-        <div className="container">
+        <div className="authContainer">
             <div className={`signUpContainer ${signIn ? 'signUpContainer-nonSignedIn' : ''}`}>
                 <form className="form">
                 <h1 className="title">Create Account</h1>
