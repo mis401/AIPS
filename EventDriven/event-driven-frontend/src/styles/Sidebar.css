@@ -1,0 +1,82 @@
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+    margin: 0;
+    flex-shrink: 0;
+    position: relative; 
+}
+  
+  .profile-section {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #34495e;
+    margin-bottom: 20px;
+  }
+  
+  .profile-pic {
+    width: 60px;
+    height: 60px;
+    background-color: #3498db;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .user-info h3 {
+    margin: 0;
+    font-size: 1.2em;
+  }
+  
+  .user-info p {
+    margin: 0;
+    font-size: 0.9em;
+  }
+  
+  .communities-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .community {
+    width: 210px; /* Širina kruga jednak je širini sidebar-a minus padding sa obe strane */
+    height: 210px; /* Visina kruga je ista kao širina da bi se formirao krug */
+    background-color: #34495e;
+    margin: 10px auto; /* Centriranje unutar sidebar-a */
+    border-radius: 50%; /* Ovo stvara krug */
+    display: flex; /* Omogućava centriranje teksta unutar kruga */
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px; /* Odstojanje između krugova */
+    font-size: 1em; /* Prilagodite veličinu fonta ako je potrebno */
+    color: white; /* Boja teksta unutar kruga */
+}
+.add-community {
+    position: absolute; /* Pozicionira dugme na dnu sidebar-a */
+    bottom: 20px; /* Odstojanje dugmeta od dna */
+    left: 0; /* Dugme je levo u sidebar-u */
+    right: 0; /* Dugme je desno u sidebar-u */
+    width: 210px; /* Širina dugmeta jednak je širini krugova */
+    height: 210px; /* Visina dugmeta je ista kao širina da bi se formirao krug */
+    margin: 0 auto; /* Centriranje unutar sidebar-a */
+    border-radius: 50%; /* Ovo stvara krug */
+}
+
+.add-community button {
+    background-color: #35529b;
+    color: white;
+    width: 100%; /* Koristi celu širinu svog roditelja */
+    height: 100%; /* Koristi celu visinu svog roditelja */
+    border-radius: 50%; /* Ovo stvara krug */
+    border: none;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em; /* Povećanje ikone unutar dugmeta */
+}
+
+.add-community button:hover {
+    background-color: #449d8d;
+}

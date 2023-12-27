@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function Welcome() {
     const navigate = useNavigate();
     const handleParagraphClick = () => {
-        navigate('auth');
+        navigate('/auth');
       };
     return (
         <div className="welcome-container">

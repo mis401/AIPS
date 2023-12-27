@@ -60,31 +60,33 @@ const Calendar: React.FC = () => {
   };
 
   return (
-    <div className="calendar">
-      <div className="header">
-        <button onClick={() => handleMonthChange(-1)}>&lt;</button>
-        <h2>{MONTH_NAMES[month]} {year}</h2>
-        <button onClick={() => handleMonthChange(1)}>&gt;</button>
-      </div>
-      <div className="days">
-        {DAYS.map(day => (
-          <div key={day} className="day-label">{day}</div>
-        ))}
-      </div>
-      <div className="weeks">
-        {generateCalendar().map((week, weekIndex) => (
-          <div key={weekIndex} className="week">
-            {week.map((day, dayIndex) => (
-              <div
-                key={dayIndex}
-                className={`day ${day === 0 ? 'empty' : ''} ${day === selectedDate ? 'selected' : ''}`}
-                onClick={() => handleDateClick(day)}
-              >
-                {day !== 0 && day}
-              </div>
-            ))}
-          </div>
-        ))}
+    <div className="home-container">
+      <div className="calendar">
+        <div className="header">
+          <button onClick={() => handleMonthChange(-1)}>&lt;</button>
+          <h2>{MONTH_NAMES[month]} {year}</h2>
+          <button onClick={() => handleMonthChange(1)}>&gt;</button>
+        </div>
+        <div className="days">
+          {DAYS.map(day => (
+            <div key={day} className="day-label">{day}</div>
+          ))}
+        </div>
+        <div className="weeks">
+          {generateCalendar().map((week, weekIndex) => (
+            <div key={weekIndex} className="week">
+              {week.map((day, dayIndex) => (
+                <div
+                  key={dayIndex}
+                  className={`day ${day === 0 ? 'empty' : ''} ${day === selectedDate ? 'selected' : ''}`}
+                  onClick={() => handleDateClick(day)}
+                >
+                  {day !== 0 && day}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

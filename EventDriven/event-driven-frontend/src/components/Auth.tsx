@@ -10,7 +10,7 @@ function Auth(){
 
     const navigate = useNavigate();
     const handleParagraphClick = () => {
-        navigate('home');
+        navigate('/home');
       };
     return(
         <div className="container">
