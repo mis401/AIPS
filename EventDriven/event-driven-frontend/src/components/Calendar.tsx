@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Calendar.css';
+import Day from './Day';
 
 const Calendar: React.FC = () => {
   const MONTH_NAMES: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -33,6 +34,12 @@ const Calendar: React.FC = () => {
         weeks[currentWeek] = [];
       }
       weeks[currentWeek].push(day);
+    }
+
+    const lastWeek = weeks[weeks.length - 1];
+    const remainingEmptyDays = 7 - lastWeek.length;
+    for (let i = 0; i < remainingEmptyDays; i++) {
+      lastWeek.push(0);
     }
 
     return weeks;
@@ -74,13 +81,12 @@ const Calendar: React.FC = () => {
           {generateCalendar().map((week, weekIndex) => (
             <div key={weekIndex} className="week">
               {week.map((day, dayIndex) => (
-                <div
+                <Day
                   key={dayIndex}
-                  className={`day ${day === 0 ? 'empty' : ''} ${day === selectedDate ? 'selected' : ''}`}
-                  onClick={() => handleDateClick(day)}
-                >
-                  {day !== 0 && day}
-                </div>
+                  day={day}
+                  isSelected={day === selectedDate}
+                  onDateClick={handleDateClick}
+                />
               ))}
             </div>
           ))}
