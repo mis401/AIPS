@@ -12,7 +12,7 @@
 - ~~signup~~
 - ~~signin~~
 - signout
-- routing
+- ~~routing - fali deo za auth~~
 
 
 
