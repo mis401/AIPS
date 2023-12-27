@@ -40,8 +40,6 @@ const Calendar: React.FC = () => {
 
   const handleDateClick = (day: number) => {
     setSelectedDate(day);
-    // You can add more logic here, like showing the event modal for the selected date
-    // For simplicity, I'll just log the selected date to the console
     console.log(`Selected date: ${year}-${month + 1}-${day}`);
   };
 
