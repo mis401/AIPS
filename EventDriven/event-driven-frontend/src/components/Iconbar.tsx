@@ -9,8 +9,12 @@ function IconsBar() {
             <NotificationsIcon sx={{
                     padding: '15px'
                 }}/>
-            <Forum />
-            <SettingsIcon />
+            <Forum sx={{
+                    padding: '15px'
+                }} />
+            <SettingsIcon sx={{
+                    padding: '15px'
+                }}/>
         </div>
     );
 }
