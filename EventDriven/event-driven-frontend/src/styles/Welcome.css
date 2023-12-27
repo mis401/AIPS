@@ -8,8 +8,9 @@
     color: #e4e4e4;
     background-image: url('../assets/images/home-background.png');
     background-repeat: round;
-    padding: 50px;
     font-family: serif;
+    height: 100vh;
+    width: 100vw;
   }
   
   .join-us{
