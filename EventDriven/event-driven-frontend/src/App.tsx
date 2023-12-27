@@ -11,7 +11,7 @@ function App() {
     <Routes>
       <Route path='/' element={ <Welcome /> } />
       <Route path='auth' element={ <Auth /> } />
-      <Route path='home' element= { <Home /> } /> /* da li ce ovde da stoji Calendar kao podruta obzirom da je uvek na home? */
+      <Route path='home' element= { <Home /> } /> 
     </Routes>
   );
 }
