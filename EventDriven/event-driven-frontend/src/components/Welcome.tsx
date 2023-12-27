@@ -1,11 +1,16 @@
 import React from 'react';
 import '../styles/Welcome.css';
+import { useNavigate } from 'react-router-dom';
 
 function Welcome() {
+    const navigate = useNavigate();
+    const handleParagraphClick = () => {
+        navigate('auth');
+      };
     return (
         <div className="welcome-container">
-            <p className="join-us">
-            Join us
+            <p className="join-us" onClick={handleParagraphClick}>
+                Join us
             </p>
 
         <div className="main-container">

@@ -18,6 +18,10 @@
     font-size: larger;
   }
 
+  .join-us:hover {
+    cursor: pointer;
+  }
+
   .main-container {
     display: flex;
     flex-direction: column;

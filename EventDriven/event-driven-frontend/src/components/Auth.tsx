@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
+import { useNavigate } from "react-router";
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);
     
     const handleSignInClick = () => setSignIn(false);
     const handleSignUpClick = () => setSignIn(true);
+
+    const navigate = useNavigate();
+    const handleParagraphClick = () => {
+        navigate('home');
+      };
     return(
         <div className="container">
             <div className={`signUpContainer ${signIn ? 'signUpContainer-nonSignedIn' : ''}`}>
@@ -16,7 +22,8 @@ function Auth(){
                     <input type='email' placeholder='Email' className="input" />
                     <input type='password' placeholder='Password' className="input" />
                     <input type='password' placeholder='Confirm Password' className="input" />
-                    <button className="button">{signIn ? 'Sign Up' : 'Sign In'}</button>
+                    <button className="button">Sign Up</button>
+                    {/*trebalo bi nekako da se nakon sign up-a da ga prebaci na sign in*/}
                 </form>
             </div>  
             <div className={`signInContainer ${signIn ? ' signInContainer-nonSignedIn' : ''}`}>
@@ -25,7 +32,7 @@ function Auth(){
                     <input type="email" placeholder="Email" className="input" />
                     <input type="password" placeholder="Password" className="input" />
                     <a href="#" className="anchor">Forgot your password?</a>
-                    <button className="button">Sign In</button>
+                    <button className="button" onClick={handleParagraphClick}>Sign In</button>
                 </form>
             </div> 
             <div className={`overlayContainer ${signIn ? ' overlayContainer-nonSignedIn' : ''}`}>
