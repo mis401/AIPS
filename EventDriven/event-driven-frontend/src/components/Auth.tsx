@@ -17,7 +17,7 @@ function Auth(){
     //connect
     const handleSignUp = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault(); 
-
+        
         const formData = new FormData();
         const formObject: { [key:string] : string } = {};
         formData.forEach((value, key) => {
@@ -65,7 +65,7 @@ function Auth(){
                     <input type='email' placeholder='Email' className="input" />
                     <input type='password' placeholder='Password' className="input" />
                     <input type='password' placeholder='Confirm Password' className="input" />
-                    <button className="button" onClick={(e) => handleSignUp(e)}>Sign Up</button>
+                    <button className="button" onClick={handleSignUp}>Sign Up</button>
                     {/*trebalo bi nekako da se nakon sign up-a da ga prebaci na sign in*/}
                 </form>
             </div>  
