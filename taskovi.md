@@ -12,12 +12,10 @@
 
 # Andjelija
 - ~~login nakon signup~~
-- ~~signup~~
-- ~~signin~~
-- signout
-- povezivanje auth
+- ~~signup, signin~~, signout
+- ~~povezivanje auth~~
 - autorizovane rute
-- ~~routing - fali deo za auth~~
+- ~~routing~~
 
 
 
