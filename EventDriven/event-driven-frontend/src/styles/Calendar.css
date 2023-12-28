@@ -8,6 +8,13 @@
   .header {
     display: flex;
     align-items: center;
+    justify-content: space-around;
+  }
+
+  .monthChangerDiv{
+    width: 50%;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
   }
   
@@ -42,9 +49,8 @@
   
   .day {
     width: 15%;
-    height: calc(100vh/8.2);
+    height: calc(100vh/9);
     text-align: center;
-    cursor: pointer;
     transition: background-color 0.3s ease;
     border: 1px solid #cbd5e0;
     display: flex;
@@ -63,6 +69,10 @@
     color: #fff;
   }
   
+  .dayLabel.faded {
+    color: #c2bcbc;
+  }
+
   .home-container{
     flex-grow: 1;
     display: flex;

@@ -6,13 +6,13 @@ import SettingsIcon from '@mui/icons-material/Settings';
 function IconsBar() {
     return (
         <div className="icons-bar">
-            <NotificationsIcon sx={{
+            <NotificationsIcon className='icon' sx={{
                     padding: '15px'
                 }}/>
-            <Forum sx={{
+            <Forum className='icon msg' sx={{
                     padding: '15px'
                 }} />
-            <SettingsIcon sx={{
+            <SettingsIcon className='icon' sx={{
                     padding: '15px'
                 }}/>
         </div>

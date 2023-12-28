@@ -16,15 +16,17 @@ const Sidebar = () => {
           <p>email@example.com</p>
         </div>
       </div>
-      <div className="communities-section">
-        {communities.map((community) => (
-          <div key={community.id} className="community">
-            <span>{community.name}</span>
-          </div>
-        ))}
-        <div className="add-community">
-          <button>+</button>
+      <div className='scrollable-communities'>
+        <div className="communities-section">
+          {communities.map((community) => (
+            <div key={community.id} className="community">
+              <span>{community.name}</span>
+            </div>
+          ))}
         </div>
+      </div>
+      <div className="add-community">
+        <button>+</button>
       </div>
     </aside>
   );

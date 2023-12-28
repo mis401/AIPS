@@ -5,7 +5,7 @@
 
 # Kristina
 - ~~landing page~~
-- kalendar
+- ~~kalendar~~
 
 # Andjelija
 - ~~login nakon signup~~

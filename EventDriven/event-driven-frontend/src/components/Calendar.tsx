@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import '../styles/Calendar.css';
-import Day from './Day';
+import { useEffect, useState } from "react";
+import Day from "./Day";
+import "../styles/Calendar.css";
+
+export interface DayObject {
+  day: number;
+  isCurrentMonth: boolean;
+}
 
 const Calendar: React.FC = () => {
   const MONTH_NAMES: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -8,7 +13,7 @@ const Calendar: React.FC = () => {
 
   const [month, setMonth] = useState<number>(0);
   const [year, setYear] = useState<number>(0);
-  const [selectedDate, setSelectedDate] = useState<number | null>(null);
+  const [selectedDate, setSelectedDate] = useState<DayObject | null>(null);
 
   useEffect(() => {
     const today = new Date();
@@ -21,11 +26,16 @@ const Calendar: React.FC = () => {
   const generateCalendar = () => {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfWeek = new Date(year, month, 1).getDay();
-    const weeks: number[][] = [[]];
+    const weeks: DayObject[][] = [[]];
     let currentWeek = 0;
 
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      weeks[currentWeek].push(0);
+    const prevMonthDays = getDaysInMonth(year, month - 1);
+
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      weeks[currentWeek].push({
+        day: prevMonthDays - i,
+        isCurrentMonth: false,
+      });
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -33,21 +43,41 @@ const Calendar: React.FC = () => {
         currentWeek++;
         weeks[currentWeek] = [];
       }
-      weeks[currentWeek].push(day);
+      weeks[currentWeek].push({
+        day,
+        isCurrentMonth: true,
+      });
     }
 
     const lastWeek = weeks[weeks.length - 1];
     const remainingEmptyDays = 7 - lastWeek.length;
     for (let i = 0; i < remainingEmptyDays; i++) {
-      lastWeek.push(0);
+      weeks[currentWeek].push({
+        day: i + 1,
+        isCurrentMonth: false,
+      });
+    }
+
+    while (weeks.length < 6) {
+      currentWeek++;
+      weeks[currentWeek] = [];
+
+      for (let i = 0; i < 7; i++) {
+        weeks[currentWeek].push({
+          day: i + 1,
+          isCurrentMonth: false,
+        });
+      }
     }
 
     return weeks;
   };
 
-  const handleDateClick = (day: number) => {
+  const handleDateClick = (day: DayObject) => {
     setSelectedDate(day);
-    console.log(`Selected date: ${year}-${month + 1}-${day}`);
+    console.log(`Selected date: ${year}-${month + 1}-${day.day}`);
+
+    //otvaranje dokumenta
   };
 
   const handleMonthChange = (increment: number) => {
@@ -68,9 +98,15 @@ const Calendar: React.FC = () => {
     <div className="home-container">
       <div className="calendar">
         <div className="header">
-          <button onClick={() => handleMonthChange(-1)}>&lt;</button>
-          <h2>{MONTH_NAMES[month]} {year}</h2>
-          <button onClick={() => handleMonthChange(1)}>&gt;</button>
+          <div>
+            <label> Ime zajednice </label>
+          </div>
+
+          <div className="monthChangerDiv">
+            <button onClick={() => handleMonthChange(-1)}>&lt;</button>
+            <h2>{MONTH_NAMES[month]} {year}</h2>
+            <button onClick={() => handleMonthChange(1)}>&gt;</button>
+          </div>
         </div>
         <div className="days">
           {DAYS.map(day => (

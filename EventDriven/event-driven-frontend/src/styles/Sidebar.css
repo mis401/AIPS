@@ -35,14 +35,27 @@
     font-size: 0.9em;
   }
   
+  .scrollable-communities {
+    overflow-y: auto;
+    max-height: 300px; 
+  }
+
+  .scrollable-communities::-webkit-scrollbar {
+    width: 0;  
+  }
+  
+  .scrollable-communities::-webkit-scrollbar-thumb {
+    background-color: transparent;  
+  }
+
   .communities-section {
     display: flex;
     flex-direction: column;
   }
   
   .community {
-    width: 210px; /* Širina kruga jednak je širini sidebar-a minus padding sa obe strane */
-    height: 210px; /* Visina kruga je ista kao širina da bi se formirao krug */
+    width: 180px; /* Širina kruga jednak je širini sidebar-a minus padding sa obe strane */
+    height: 180px; /* Visina kruga je ista kao širina da bi se formirao krug */
     background-color: #34495e;
     margin: 10px auto; /* Centriranje unutar sidebar-a */
     border-radius: 50%; /* Ovo stvara krug */
@@ -58,8 +71,8 @@
     bottom: 20px; /* Odstojanje dugmeta od dna */
     left: 0; /* Dugme je levo u sidebar-u */
     right: 0; /* Dugme je desno u sidebar-u */
-    width: 210px; /* Širina dugmeta jednak je širini krugova */
-    height: 210px; /* Visina dugmeta je ista kao širina da bi se formirao krug */
+    width: 180px; /* Širina dugmeta jednak je širini krugova */
+    height: 180px; /* Visina dugmeta je ista kao širina da bi se formirao krug */
     margin: 0 auto; /* Centriranje unutar sidebar-a */
     border-radius: 50%; /* Ovo stvara krug */
 }
