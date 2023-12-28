@@ -37,7 +37,7 @@
   
   .scrollable-communities {
     overflow-y: auto;
-    max-height: 300px; 
+    max-height: 330px; 
   }
 
   .scrollable-communities::-webkit-scrollbar {
@@ -71,8 +71,8 @@
     bottom: 20px; /* Odstojanje dugmeta od dna */
     left: 0; /* Dugme je levo u sidebar-u */
     right: 0; /* Dugme je desno u sidebar-u */
-    width: 180px; /* Širina dugmeta jednak je širini krugova */
-    height: 180px; /* Visina dugmeta je ista kao širina da bi se formirao krug */
+    width: 150px; /* Širina dugmeta jednak je širini krugova */
+    height: 150px; /* Visina dugmeta je ista kao širina da bi se formirao krug */
     margin: 0 auto; /* Centriranje unutar sidebar-a */
     border-radius: 50%; /* Ovo stvara krug */
 }

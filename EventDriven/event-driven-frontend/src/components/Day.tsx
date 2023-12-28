@@ -54,6 +54,9 @@ const Day: React.FC<DayProps> = ({ day, isSelected, onDateClick }) => {
         onClose={handleDialogClose}
         selectedOption={selectedOption}
         onCreateButtonClick={handleCreateButtonClick}
+        title="Create a new document"
+        options={['Text Document', 'To-do List', 'Whiteboard']}
+        buttonText='Create'
       />
     </div>
   );

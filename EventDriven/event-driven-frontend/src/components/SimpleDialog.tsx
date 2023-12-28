@@ -10,7 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import TextSnippetRoundedIcon from '@mui/icons-material/TextSnippetRounded';
 
-const options = ['Text Document', 'To-do List', 'Whiteboard'];
+// const options = ['Text Document', 'To-do List', 'Whiteboard'];
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -18,10 +18,13 @@ export interface SimpleDialogProps {
   onClose: (value: string) => void;
   selectedOption: string | null;
   onCreateButtonClick: () => void;
+  title: string;
+  options: string[];
+  buttonText: string;
 }
 
 function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open, selectedOption, onCreateButtonClick } = props;
+  const { onClose, selectedValue, open, selectedOption, onCreateButtonClick, title, options, buttonText } = props;
 
   const handleClose = () => {
     onClose(selectedValue);
@@ -33,7 +36,7 @@ function SimpleDialog(props: SimpleDialogProps) {
 
   return (
     <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Create a new document</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <List sx={{ pt: 0 }}>
         {options.map((option) => (
           <ListItem disableGutters key={option}>
@@ -51,7 +54,7 @@ function SimpleDialog(props: SimpleDialogProps) {
           </ListItem>
         ))}
         <div className='createButtonDiv'>
-          <Button onClick={onCreateButtonClick}>CREATE</Button>
+          <Button onClick={onCreateButtonClick}>{buttonText}</Button>
         </div>
       </List>
     </Dialog>
