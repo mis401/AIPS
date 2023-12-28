@@ -8,43 +8,84 @@ function Auth(){
     
     const handleSignInClick = () => setSignIn(false);
     const handleSignUpClick = () => setSignIn(true);
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
 
     const navigate = useNavigate();
     const handleParagraphClick = () => {
         navigate('/home');
       };
 
+    function handleFirstName(event: React.ChangeEvent<HTMLInputElement>) {
+        setFormData((currentFormData) => {
+            return {
+                ...currentFormData,
+                firstName: event.target.value,
+            };
+        });
+    }
+    function handleLastName(event: React.ChangeEvent<HTMLInputElement>) {
+        setFormData((currentFormData) => {
+            return {
+                ...currentFormData,
+                lastName: event.target.value,
+            };
+        });
+    }
+    function handleEmail(event: React.ChangeEvent<HTMLInputElement>) {
+        setFormData((currentFormData) => {
+            return {
+                ...currentFormData,
+                email: event.target.value,
+            };
+        });
+    }
+    function handlePassword(event: React.ChangeEvent<HTMLInputElement>) {
+        setFormData((currentFormData) => {
+            return {
+                ...currentFormData,
+                password: event.target.value,
+            };
+        });
+    }
+    function handleConfirmPassword(event: React.ChangeEvent<HTMLInputElement>) {
+        setFormData((currentFormData) => {
+            return {
+                ...currentFormData,
+                confirmPassword: event.target.value,
+            };
+        });
+    }
     //connect
     const handleSignUp = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault(); 
+        
 
-        const formData = new FormData();
-        const formObject: { [key:string] : string } = {};
-        formData.forEach((value, key) => {
-            formObject[key] = value.toString();
-        });
-
-        if(formObject.password !== formObject.confirmPasword){
+        if(formData.password !== formData.confirmPassword){
             console.error('Passwords do not match');
             return;
         }
-
         try {
-            const response = await fetch('auth/signup', {
+            const response = await fetch('http://localhost:8000/auth/signup', {
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
                 },
                 body: JSON.stringify({
-                    firstName: formObject.firstName,
-                    lastName: formObject.lastName,
-                    email: formObject.email,
-                    password: formObject.password,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    email: formData.email,
+                    password: formData.password,
                 }),
             });
 
             if(response.ok) {
-                navigate('/home');
+                handleSignInClick();
             } else {
                 const errorData = await response.json();
 
@@ -58,19 +99,19 @@ function Auth(){
     return(
         <div className="authContainer">
             <div className={`signUpContainer ${signIn ? 'signUpContainer-nonSignedIn' : ''}`}>
-                <form className="form">
+                <form name="signupForm" className="form">
                 <h1 className="title">Create Account</h1>
-                    <input type='text' placeholder='First Name' className="input" />
-                    <input type='text' placeholder='Last Name' className="input" /> 
-                    <input type='email' placeholder='Email' className="input" />
-                    <input type='password' placeholder='Password' className="input" />
-                    <input type='password' placeholder='Confirm Password' className="input" />
+                    <input type='text' placeholder='First Name' className="input" onChange={handleFirstName}/>
+                    <input type='text' placeholder='Last Name' className="input" onChange={handleLastName} /> 
+                    <input type='email' placeholder='Email' className="input" onChange={handleEmail} />
+                    <input type='password' placeholder='Password' className="input" onChange={handlePassword} />
+                    <input type='password' placeholder='Confirm Password' className="input"onChange={handleConfirmPassword}  />
                     <button className="button" onClick={(e) => handleSignUp(e)}>Sign Up</button>
                     {/*trebalo bi nekako da se nakon sign up-a da ga prebaci na sign in*/}
                 </form>
             </div>  
             <div className={`signInContainer ${signIn ? ' signInContainer-nonSignedIn' : ''}`}>
-                <form className="form">
+                <form name="signinForm" className="form">
                 <h1 className="title">Sign In</h1>
                     <input type="email" placeholder="Email" className="input" />
                     <input type="password" placeholder="Password" className="input" />

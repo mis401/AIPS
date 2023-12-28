@@ -12,12 +12,10 @@ export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
     async signup(dto: AuthDto) {
-        const { firstName, lastName, email, password, confirmPassword } = dto;
-
-        if (password !== confirmPassword) {
-            throw new BadRequestException('Passwords do not match');
-        }
         
+        const { firstName, lastName, email, password } = dto;
+
+
         const foundUser = await this.prisma.user.findUnique({where:{email}})
 
         if(foundUser){
