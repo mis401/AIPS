@@ -15,9 +15,9 @@
   
   .join-us{
     align-self: flex-end;
-    margin-top: -20px;
     font-style: oblique;
     font-size: larger;
+    margin-right: 20px;
   }
 
   .join-us:hover {
