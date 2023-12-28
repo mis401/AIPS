@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, Post } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import *  as bcrypt from 'bcrypt'
@@ -12,19 +12,25 @@ export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
     async signup(dto: AuthDto) {
-        const {email, password} = dto;
+        const { firstName, lastName, email, password, confirmPassword } = dto;
 
+        if (password !== confirmPassword) {
+            throw new BadRequestException('Passwords do not match');
+        }
+        
         const foundUser = await this.prisma.user.findUnique({where:{email}})
 
         if(foundUser){
             throw new BadRequestException('Email already exists')
         }
+        
         const hashedPassword = await this.hashPassword(password)
-
         await this.prisma.user.create({
             data: {
                 email,
-                hashedPassword
+                hashedPassword,
+                firstName,
+                lastName
             }
         })
 
