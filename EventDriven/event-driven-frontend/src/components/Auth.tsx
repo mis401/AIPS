@@ -21,7 +21,7 @@ function Auth(){
     });
 
     const setUser = (userData: User) => ({
-        type: 'SET_USER',
+        type: 'LOGIN_SUCCESS',
         payload: userData,
       });
 
@@ -86,7 +86,10 @@ function Auth(){
                 console.log('UserData after successful login:', userData);
 
                 dispatch(setUser(userData));
-                navigate('/home');
+                console.log('User data dispatched:', userData);
+                //navigate('/home');
+                setTimeout(() => navigate('/home'), 2000);
+                
             } else {
                 const errorData = await response.json();
 

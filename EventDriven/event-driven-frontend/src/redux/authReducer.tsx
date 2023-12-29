@@ -1,12 +1,13 @@
 import { AuthActionTypes, AuthState, LOGIN_SUCCESS, LOGOUT } from './authTypes';
 
-const initialState: AuthState = {
+export const initialState: AuthState = {
   user: null,
 };
 
 const authReducer = (state = initialState, action: AuthActionTypes): AuthState => {
   switch (action.type) {
     case LOGIN_SUCCESS:
+      console.log('Payload received:', action.payload);
       return {
         ...state,
         user: action.payload,

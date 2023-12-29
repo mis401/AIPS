@@ -5,7 +5,7 @@ import { User } from '../redux/authTypes';
 import SimpleDialog from './SimpleDialog';
 
 const mapStateToProps = (state: RootState) => ({
-  user: state.auth.user,
+  user: state.auth.user
 });
 
 const connector = connect(mapStateToProps);
@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
       <div className="profile-section">
         <div className="profile-pic"></div>
         <div className="user-info">
-          <h3>{user ? `${user.firstName} ${user.lastName}` : 'Guest'}</h3>
+        <h3>{user ? `${user.firstName} ${user.lastName}` : 'Guest'}</h3>
           <p>{user ? user.email : 'email@example.com'}</p>
         </div>
       </div>
