@@ -11,10 +11,15 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { EventsController } from './events/events.controller';
 import { EventsService } from './events/events.service';
+import { LocalStrategy } from './guards/local.strategy';
+import { CommunityModule } from './community/community.module';
+import { DocModule } from './doc/doc.module';
+import { EventsModule } from './events/events.module';
+import { UserModule } from './user/user.module';
 
 @Module({
-  controllers: [AppController, CommunityController, DocController, UserController, EventsController],
-  providers: [AppService, CommunityService, DocService, UserService, EventsService],
-  imports: [AuthModule, PrismaModule],
+  controllers: [AppController, ],
+  providers: [AppService, ],
+  imports: [AuthModule, PrismaModule, CommunityModule, DocModule, EventsModule, UserModule],
 })
 export class AppModule {}
