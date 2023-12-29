@@ -1,12 +1,29 @@
-import React, { useState } from 'react';
-import '../styles/Sidebar.css'; 
+import React, { useEffect } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from '../redux/rootReducer';
+import { User } from '../redux/authTypes';
 import SimpleDialog from './SimpleDialog';
 
-const Sidebar = () => {
-  
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+const mapStateToProps = (state: RootState) => ({
+  user: state.auth.user,
+});
 
+const connector = connect(mapStateToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type SidebarProps = PropsFromRedux;
+
+const Sidebar: React.FC<SidebarProps> = ({ user }) => {
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [selectedOption, setSelectedOption] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    if (user !== null) {
+      console.log('User prop changed:', user);
+    }
+  }, [user]);
+  
   const communities = [
     { id: 1, name: 'Community 1' },
     { id: 2, name: 'Community 2' },
@@ -18,7 +35,6 @@ const Sidebar = () => {
 
   function handleDialogClose(value: string): void {
     setSelectedOption(value);
-
   }
 
   function handleCreateButtonClick(): void {
@@ -30,8 +46,8 @@ const Sidebar = () => {
       <div className="profile-section">
         <div className="profile-pic"></div>
         <div className="user-info">
-          <h3>Ime Prezime</h3>
-          <p>email@example.com</p>
+          <h3>{user ? `${user.firstName} ${user.lastName}` : 'Guest'}</h3>
+          <p>{user ? user.email : 'email@example.com'}</p>
         </div>
       </div>
       <div className='scrollable-communities'>
@@ -62,4 +78,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default connector(Sidebar);

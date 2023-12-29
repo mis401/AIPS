@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
 import { useNavigate } from "react-router-dom";
-import { error } from "console";
+import { User } from '../redux/authTypes'
+import { useDispatch } from 'react-redux';
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     
     const handleSignInClick = () => setSignIn(false);
     const handleSignUpClick = () => setSignIn(true);
@@ -18,6 +20,10 @@ function Auth(){
         confirmPassword: '',
     });
 
+    const setUser = (userData: User) => ({
+        type: 'SET_USER',
+        payload: userData,
+      });
 
     const handleFieldChange = (fieldName: string, value: string) => {
         setFormData((prevData) => ({
@@ -76,6 +82,10 @@ function Auth(){
             });
 
             if(response.ok) {
+                const userData = await response.json();
+                console.log('UserData after successful login:', userData);
+
+                dispatch(setUser(userData));
                 navigate('/home');
             } else {
                 const errorData = await response.json();
