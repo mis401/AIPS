@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
 import { useNavigate } from "react-router-dom";
-import { User } from '../redux/authTypes'
+//import { User } from '../redux/authTypes'
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from "../redux/authReducer";
 
@@ -21,10 +21,10 @@ function Auth(){
         confirmPassword: '',
     });
 
-    const setUser = (userData: User) => ({
-        type: 'LOGIN_SUCCESS',
-        payload: userData,
-      });
+    // const setUser = (userData: User) => ({
+    //     type: 'LOGIN_SUCCESS',
+    //     payload: userData,
+    //   });
 
     const handleFieldChange = (fieldName: string, value: string) => {
         setFormData((prevData) => ({
@@ -85,8 +85,8 @@ function Auth(){
             if(response.ok) {
                 const userData = await response.json();
                 console.log('UserData after successful login:', userData);
-
-                dispatch(loginSuccess(userData));
+                console.log(userData)
+                dispatch(loginSuccess(userData.user));
                 console.log('User data dispatched:', userData);
                 navigate('/home');
                 

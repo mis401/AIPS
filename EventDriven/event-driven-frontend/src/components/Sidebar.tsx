@@ -1,30 +1,30 @@
 import React, { useEffect } from 'react';
 import { connect, ConnectedProps, useSelector } from 'react-redux';
-import { RootState } from '../redux/rootReducer';
-import { User } from '../redux/authTypes';
+//import { RootState } from '../redux/rootReducer';
+//import { User } from '../redux/authTypes';
 import SimpleDialog from './SimpleDialog';
 
-const mapStateToProps = (state: RootState) => ({
-  user: state.auth.user
-});
+// const mapStateToProps = (state: RootState) => ({
+//   user: state.auth.user
+// });
 
 
 
-const connector = connect(mapStateToProps);
+//const connector = connect(mapStateToProps);
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
+//type PropsFromRedux = ConnectedProps<typeof connector>;
 
-type SidebarProps = PropsFromRedux;
+//type SidebarProps = PropsFromRedux;
 
-const Sidebar: React.FC<SidebarProps> = ({ user }) => {
+export function Sidebar() {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<string | null>(null);
   const userInState = useSelector((state: any) => state.auth.user);
-  useEffect(() => {
-    if (user !== null) {
-      console.log('User prop changed:', user);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (userInState !== null) {
+  //     console.log('User prop changed:', userInState);
+  //   }
+  // }, [userInState]);
   
   const communities = [
     { id: 1, name: 'Community 1' },
@@ -80,4 +80,5 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   );
 };
 
-export default connector(Sidebar);
+export default Sidebar;
+//export default connector(Sidebar);
