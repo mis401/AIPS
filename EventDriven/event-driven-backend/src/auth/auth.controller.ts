@@ -11,10 +11,11 @@ export class AuthController {
   signup(@Body() dto: SignUpDto) {
     return this.authService.signup(dto);
   }
+
   @UseGuards(LocalAuthGuard)
   @Post('signin')
   signin(@Request() req, @Res() res){
-    return this.authService.signin(req.user, res);
+    return this.authService.signin( req.user, res);
   }
 
   @Get('signout')

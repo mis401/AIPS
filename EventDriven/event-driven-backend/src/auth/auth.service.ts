@@ -35,8 +35,8 @@ export class AuthService {
     return {message: 'signup was successful'};
     }
 
-    async signin(user, res: Response){
-        
+    async signin(foundUser, res: Response){
+        // const {email,password} = dto;
 
         // const foundUser = await this.prisma.user.findUnique({where:{email}})
         // if(!foundUser){
@@ -55,8 +55,8 @@ export class AuthService {
         //sign jwt and return to the user
         const token = await this.signToken(
             {
-                id: user.id, 
-                email: user.email
+                id: foundUser.id, 
+                email: foundUser.email
             });
 
         if( !token){
@@ -66,14 +66,8 @@ export class AuthService {
         res.cookie('token', token);
         
         return res.send({
-            message: 'Logged in successfully',
-            user: {
-              email: foundUser.email,
-              firstName: foundUser.firstName,
-              lastName: foundUser.lastName,
-            },
-          });
-          
+            user: foundUser,
+        });
     }
 
     async singout(req: Request, res:Response) {
