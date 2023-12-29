@@ -38,14 +38,47 @@ export class CommunityService {
                             email: true,
                         }
                     },
-                    createdUser: true,
+                    createdUser: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                        }
+                    },
                     calendar: {
                         include: {
-                            documents: true,
+                            events: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    start: true,
+                                    end: true,
+                                    color: true
+                                }
+                            },
+                            documents: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    day: true,
+                                    type: true,
+                                    createdAt: true,
+                                    updatedAt: true,
+                                    createdBy: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                            id: true,
+                                        }
+                                    }
+                                }
+                                }
+                            },
                         }
                     }
                 }
-            })    
+            )
             if (!community) {
                 throw new NotFoundException('Community not found')
             }

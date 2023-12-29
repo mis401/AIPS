@@ -46,7 +46,7 @@ model Calendar {
   name     String
   community Community? @relation("calendarOf")
   documents Document[]
-  event Event[]
+  events Event[]
 }
 
 model Document {

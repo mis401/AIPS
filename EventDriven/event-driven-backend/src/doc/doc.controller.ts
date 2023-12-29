@@ -9,7 +9,7 @@ export class DocController {
 
     @Get('get')
     async getDoc(@Query('id') id: number) {
-        //return await this.DocService.getDoc(id);
+        return await this.DocService.getDoc(id);
     }
 
 }
