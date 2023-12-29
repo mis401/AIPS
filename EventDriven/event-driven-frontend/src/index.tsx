@@ -5,10 +5,9 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import rootReducer from './redux/rootReducer'; // Pretpostavljajući da postoji rootReducer
+import store from './redux/store';
 
-const store = createStore(rootReducer);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

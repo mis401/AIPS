@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { connect, ConnectedProps } from 'react-redux';
+import { connect, ConnectedProps, useSelector } from 'react-redux';
 import { RootState } from '../redux/rootReducer';
 import { User } from '../redux/authTypes';
 import SimpleDialog from './SimpleDialog';
@@ -7,6 +7,8 @@ import SimpleDialog from './SimpleDialog';
 const mapStateToProps = (state: RootState) => ({
   user: state.auth.user
 });
+
+
 
 const connector = connect(mapStateToProps);
 
@@ -17,7 +19,7 @@ type SidebarProps = PropsFromRedux;
 const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<string | null>(null);
-
+  const userInState = useSelector((state: any) => state.auth.user);
   useEffect(() => {
     if (user !== null) {
       console.log('User prop changed:', user);
@@ -46,8 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
       <div className="profile-section">
         <div className="profile-pic"></div>
         <div className="user-info">
-        <h3>{user ? `${user.firstName} ${user.lastName}` : 'Guest'}</h3>
-          <p>{user ? user.email : 'email@example.com'}</p>
+        <h3>{userInState ? `${userInState.firstName} ${userInState.lastName}` : 'Guest'}</h3>
+          <p>{userInState ? userInState.email : 'email@example.com'}</p>
         </div>
       </div>
       <div className='scrollable-communities'>

@@ -3,6 +3,7 @@ import '../styles/Auth.css'
 import { useNavigate } from "react-router-dom";
 import { User } from '../redux/authTypes'
 import { useDispatch } from 'react-redux';
+import { loginSuccess } from "../redux/authReducer";
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);
@@ -85,10 +86,9 @@ function Auth(){
                 const userData = await response.json();
                 console.log('UserData after successful login:', userData);
 
-                dispatch(setUser(userData));
+                dispatch(loginSuccess(userData));
                 console.log('User data dispatched:', userData);
-                //navigate('/home');
-                setTimeout(() => navigate('/home'), 2000);
+                navigate('/home');
                 
             } else {
                 const errorData = await response.json();
