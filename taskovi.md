@@ -2,6 +2,8 @@
 - ~~model~~
 - CRUD
 - guard
+- crud za user, event
+
 
 # Kristina
 - ~~landing page~~
