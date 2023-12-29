@@ -1,20 +1,21 @@
 # Mihajlo
 - ~~model~~
-- CRUD
-- guard
-- crud za user, event
+- CRUD doc
+- ~~jwt guard~~
+- role guard?
+- ~~crud za user, event~~
 
 
 # Kristina
 - ~~landing page~~
 - ~~kalendar~~
 - interceptor
-- instalacija redux
+- ~~instalacija redux~~
 - cuvanje jwt local/cookie
 
 # Andjelija
 - ~~login nakon signup~~
-- ~~signup, signin~~, signout
+- ~~signup, signin, signout~~
 - ~~povezivanje auth~~
 - autorizovane rute
 - ~~routing~~
