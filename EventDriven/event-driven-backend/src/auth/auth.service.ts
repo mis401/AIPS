@@ -65,7 +65,15 @@ export class AuthService {
 
         res.cookie('token', token);
         
-        return res.send({message: 'Logged in successfully'});
+        return res.send({
+            message: 'Logged in successfully',
+            user: {
+              email: foundUser.email,
+              firstName: foundUser.firstName,
+              lastName: foundUser.lastName,
+            },
+          });
+          
     }
 
     async singout(req: Request, res:Response) {
