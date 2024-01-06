@@ -35,3 +35,8 @@
     - CRUD za dokumenta
     - CRUD za zajednice
     - ceo layout
+ 
+    - funkcija za vracanje dogadjaja
+    - react redux u svim komponentama
+    - dokumenti: otvaranje, manipulacija
+    - rabbit mq instalacija
