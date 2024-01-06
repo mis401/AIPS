@@ -35,7 +35,8 @@
     - CRUD za dokumenta
     - CRUD za zajednice
     - ceo layout
- ----
+      
+## taskovi za treću fazu
     - funkcija za vracanje dogadjaja
     - react redux u svim komponentama
     - dokumenti: otvaranje, manipulacija
