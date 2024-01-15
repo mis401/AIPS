@@ -1,6 +1,6 @@
 # Mihajlo
 - ~~model~~
-- CRUD doc
+- CRUD generalno
 - ~~jwt guard~~
 - role guard?
 - ~~crud za user, event~~
@@ -12,6 +12,7 @@
 - interceptor
 - ~~instalacija redux~~
 - cuvanje jwt local/cookie
+- otvaranje dokumenata
 
 # Andjelija
 - ~~login nakon signup~~
@@ -19,6 +20,7 @@
 - ~~povezivanje auth~~
 - autorizovane rute
 - ~~routing~~
+- react redux
 
 
 
@@ -41,3 +43,4 @@
     - react redux u svim komponentama
     - dokumenti: otvaranje, manipulacija
     - rabbit mq instalacija
+    - čet, obaveštenja
