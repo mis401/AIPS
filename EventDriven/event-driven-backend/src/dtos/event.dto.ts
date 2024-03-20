@@ -11,11 +11,13 @@ export class EventDTO {
     @IsString()
     name: string;
 
+    @Transform(({ value }) => new Date(value))
     @IsNotEmpty()
     @IsDate()
     start: Date;
 
     @IsNotEmpty()
+    @Transform(({ value }) => new Date(value))
     @IsDate()
     end: Date;
 

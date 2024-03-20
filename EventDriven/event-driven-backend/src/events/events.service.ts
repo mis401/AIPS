@@ -69,6 +69,7 @@ export class EventsService {
                 }
             }
         });
+        return eventDB;
     }
 
     async updateEvent(event: EventDTO){

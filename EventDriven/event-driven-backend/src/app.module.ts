@@ -16,10 +16,11 @@ import { CommunityModule } from './community/community.module';
 import { DocModule } from './doc/doc.module';
 import { EventsModule } from './events/events.module';
 import { UserModule } from './user/user.module';
+import { FilesysService } from './filesys/filesys.service';
 
 @Module({
   controllers: [AppController, ],
-  providers: [AppService, ],
+  providers: [AppService, FilesysService, ],
   imports: [AuthModule, PrismaModule, CommunityModule, DocModule, EventsModule, UserModule],
 })
 export class AppModule {}

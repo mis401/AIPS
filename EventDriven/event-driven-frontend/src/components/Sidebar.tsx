@@ -16,20 +16,35 @@ import SimpleDialog from './SimpleDialog';
 
 //type SidebarProps = PropsFromRedux;
 
-export function Sidebar() {
+export const Sidebar: React.FC = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<string | null>(null);
   const userInState = useSelector((state: any) => state.auth.user);
-  // useEffect(() => {
-  //   if (userInState !== null) {
-  //     console.log('User prop changed:', userInState);
-  //   }
-  // }, [userInState]);
+  const [communities, setCommunities] = React.useState<any[]>([]);
+  useEffect(() => {
+    if (userInState !== null) {
+      console.log('User prop changed:', userInState);
+      const response = fetch(`http://localhost:8000/community/get-all?${userInState.id}`, {
+        method: `GET`
+      })
+      response.then(async (value) => {
+        if (value.ok){
+          const data = value.json();
+          console.log(data);
+          data.then((array) => {
+            setCommunities([...array]);
+          })
+        }
+      })
+    }
+  }, [userInState]);
   
-  const communities = [
-    { id: 1, name: 'Community 1' },
-    { id: 2, name: 'Community 2' },
-  ]; /*dok ne vezemo sa back */
+  // const communities: any[] = (async () => {
+  //   return await fetch(`http://localhost:8000/community/get-all?userId=${userInState.id}`, {
+  //     method: 'GET'
+  //   })
+  // })()
+
 
   const addCommunityClick = () => {
     setOpenDialog(true);
@@ -41,6 +56,10 @@ export function Sidebar() {
 
   function handleCreateButtonClick(): void {
     setOpenDialog(false);
+  }
+
+  async function joinCommunity(){
+
   }
 
   return (
