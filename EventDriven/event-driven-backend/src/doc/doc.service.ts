@@ -1,5 +1,6 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Community, DocumentType } from '@prisma/client';
+import { Http2ServerResponse } from 'http2';
 import { PrismaService } from 'prisma/prisma.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FilesysService } from 'src/filesys/filesys.service';
@@ -9,36 +10,6 @@ const fs = require('node:fs');
 export class DocService {
     constructor(private prisma: PrismaService, private filesys: FilesysService) {}
 
-    async getDoc(id: number){
-        try{
-            const docId = Number(id);
-            if (isNaN(docId)) {
-                throw new Error('Invalid doc id')
-            }
-            const doc = await this.prisma.document.findUnique({
-                where: {
-                    id: docId
-                },
-                include: {
-                    createdBy: {
-                        select: {
-                            id: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                        }
-                    },
-                }
-            });
-            if (!doc) {
-                throw new NotFoundException('Doc not found')
-            }
-            return doc;
-        } catch (error) {
-            console.log(error)
-            throw error;
-        }
-    }
 
     async createDocument(newDoc: NewDocumentDTO) {
         try {
@@ -56,16 +27,16 @@ export class DocService {
             let documentPath = null;
             switch(newDoc.type) {
                 case DocumentType.DOCUMENT:
-                    documentPath = this.filesys.generateTextDocument(newDoc, user, community);
+                    documentPath = await this.filesys.generateTextDocument(newDoc, user, community);
                     break;
-                case DocumentType.WHITEBOARD:
-                    documentPath = this.filesys.generateWhiteboardDocument(newDoc, user, community);
+                    case DocumentType.WHITEBOARD:
+                        documentPath = await this.filesys.generateWhiteboardDocument(newDoc, user, community);
                     break;
                 case DocumentType.TODO:
-                    documentPath = this.filesys.generateTodoDocument(newDoc, user, community);
+                    documentPath = await this.filesys.generateTodoDocument(newDoc, user, community);
                     break;
             }
-            if (!documentPath) {
+            if (documentPath === null) {
                 throw new Error('Document creation failed')
             }
             const doc = await this.prisma.document.create({
@@ -88,11 +59,11 @@ export class DocService {
             })
             return doc;
         } catch (error) {
-            return new InternalServerErrorException(error.message);
+            throw new InternalServerErrorException(error.message);
         }
     }
 
-    async getDocument(id: number) {
+    async getDocumentInformation(id: number) {
         try {
             const doc = await this.prisma.document.findUnique({
                 where: {
@@ -110,15 +81,53 @@ export class DocService {
         }
     }
 
+    async getDocumentContent(id: number) {
+        try{
+            const doc = await this.prisma.document.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (!doc) {
+                throw new NotFoundException('Document not found')
+            }
+            let content = null;
+            switch(doc.type){
+                case DocumentType.DOCUMENT:
+                    content = await this.filesys.getTextDocument(doc.path);
+                    break;
+                case DocumentType.TODO:
+                    content = await this.filesys.getTodoDocument(doc.path);
+                    break;
+                case DocumentType.WHITEBOARD:
+                    content = await this.filesys.getWhiteboardDocument(doc.path);//vraca se blob
+                    break;
+            }
+            if (content === null) {
+                throw new InternalServerErrorException('Document content cannot be read')
+            }
+            return content;
+        }
+        catch(e){
+            console.log(e.message);
+            throw e;
+        }
+    }
+
+    
+
     async getDocumentsForCalendarMonth(calendarId: number, month: number, year: number) {
         try {
-            const start = new Date(year, month, 1, 0, 0, 0);
-            const end = new Date(year, month + 1, 0, 23, 59, 59);
+            console.log(calendarId, month, year)
+            const start = new Date(year, month-1, 1, 0, 0, 0);
+            const end = new Date(year, month-1, 31, 23, 59, 59);
+            console.log(start);
+            console.log(end);
             const docs = await this.prisma.document.findMany({
                 where: {
                     day: {
                         gte: start,
-                        lt: end
+                        lte: end
                     },
                     calendarId: calendarId
                 },
@@ -139,7 +148,7 @@ export class DocService {
                     calendarId: true
                 }
             })
-            
+            return docs;
         }
         catch(e){
             console.log(e.message);

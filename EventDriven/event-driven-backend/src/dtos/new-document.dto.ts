@@ -1,8 +1,8 @@
 import { DocumentType } from "@prisma/client";
 
-export class NewDocumentDTO {
+export interface NewDocumentDTO {
     name: string;
-    day: Date;
+    day: string;
     createdBy: number;
     communityId: number;
     type: DocumentType;
