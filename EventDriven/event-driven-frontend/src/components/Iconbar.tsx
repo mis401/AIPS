@@ -5,8 +5,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useState } from 'react';
 import Window from './Window';
 
-function IconsBar() {
+function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
 
     const openSettingsWindow = () => {
         setIsSettingsOpen(true);
@@ -16,6 +17,7 @@ function IconsBar() {
         setIsSettingsOpen(false);
     }
 
+
     return (
         <div className="icons-bar">
             <NotificationsIcon className='icon' sx={{
@@ -23,7 +25,9 @@ function IconsBar() {
                 }}/>
             <Forum className='icon msg' sx={{
                     padding: '15px'
-                }} />
+                }}
+                onClick={toggleChatSidebar} 
+                />
             <SettingsIcon className='icon' sx={{
                     padding: '15px',
                     cursor: 'pointer'
