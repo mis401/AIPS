@@ -8,15 +8,65 @@ export class CommunityService {
     constructor(private prisma: PrismaService) {}
 
     async getUserCommunities(userId: number) {
-        return await this.prisma.community.findMany({
+        return await this.prisma.user.findMany({
             where: {
-                members: {
-                    some: {
-                        id: userId
+                id: userId
+            },
+            select: {
+                communities: {
+                    select: {
+                        id: true,
+                        name: true,
+                        members: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                            }
+                        },
+                        createdUser: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                            }
+                        },
+                        // calendar: {
+                        //     include: {
+                        //         events: {
+                        //             select: {
+                        //                 id: true,
+                        //                 name: true,
+                        //                 start: true,
+                        //                 end: true,
+                        //                 color: true
+                        //             }
+                        //         },
+                        //         documents: {
+                        //             select: {
+                        //                 id: true,
+                        //                 name: true,
+                        //                 day: true,
+                        //                 type: true,
+                        //                 createdAt: true,
+                        //                 updatedAt: true,
+                        //                 createdBy: {
+                        //                     select: {
+                        //                         firstName: true,
+                        //                         lastName: true,
+                        //                         id: true,
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
                     }
                 }
             }
-        });
+        })
     }
 
     async getCommunity(id: number) {

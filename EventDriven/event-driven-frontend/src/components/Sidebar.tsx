@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect, ConnectedProps, useSelector } from 'react-redux';
 //import { RootState } from '../redux/rootReducer';
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
 import SimpleDialog, { SimpleDialogProps } from './SimpleDialog';
 import { useDispatch } from 'react-redux';
@@ -8,16 +9,35 @@ import { loginSuccess } from "../redux/authReducer";
 import { useNavigate } from "react-router-dom";
 import store from '../redux/store';
 import { communityLoadSuccess, communitySelectSuccess } from '../redux/communityReducer';
+=======
+//import { User } from '../redux/authTypes';
+import SimpleDialog from './SimpleDialog';
+
+// const mapStateToProps = (state: RootState) => ({
+//   user: state.auth.user
+// });
+>>>>>>> origin
 
 
 export const Sidebar: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+<<<<<<< HEAD
+=======
+//const connector = connect(mapStateToProps);
+
+//type PropsFromRedux = ConnectedProps<typeof connector>;
+
+//type SidebarProps = PropsFromRedux;
+
+export const Sidebar: React.FC = () => {
+>>>>>>> origin
   const [openDialog, setOpenDialog] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<string | null>(null);
   const userInState = useSelector((state: any) => state.auth.user);
   const [communities, setCommunities] = React.useState<any[]>([]);
+<<<<<<< HEAD
   const communityInState = useSelector((state: any) => store.getState().community.communities);
   const [selectedValue, setSelectedValue] = useState<string>(""); 
   const [formData, setFormData] = useState({
@@ -68,6 +88,31 @@ useEffect(() => {
    
     }
   }
+=======
+  useEffect(() => {
+    if (userInState !== null) {
+      console.log('User prop changed:', userInState);
+      const response = fetch(`http://localhost:8000/community/get-all?${userInState.id}`, {
+        method: `GET`
+      })
+      response.then(async (value) => {
+        if (value.ok){
+          const data = value.json();
+          console.log(data);
+          data.then((array) => {
+            setCommunities([...array]);
+          })
+        }
+      })
+    }
+  }, [userInState]);
+  
+  // const communities: any[] = (async () => {
+  //   return await fetch(`http://localhost:8000/community/get-all?userId=${userInState.id}`, {
+  //     method: 'GET'
+  //   })
+  // })()
+>>>>>>> origin
 
 
   const addCommunityClick = () => {
@@ -164,6 +209,10 @@ const handleJoinButtonClick = async (): Promise<void> => {
     secondInputHint: "Join community"
   };
 
+  async function joinCommunity(){
+
+  }
+
   return (
     <aside className="sidebar">
       <div className="profile-section">
@@ -197,4 +246,8 @@ const handleJoinButtonClick = async (): Promise<void> => {
 };
 
 export default Sidebar;
+<<<<<<< HEAD
 //export default connector(Sidebar);
+=======
+//export default connector(Sidebar);
+>>>>>>> origin

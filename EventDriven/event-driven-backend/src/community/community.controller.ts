@@ -5,7 +5,7 @@ import { CommunityService } from './community.service';
 export class CommunityController {
     constructor(private communityService: CommunityService) {}
     
-    @Get('get-all')
+    @Get('get-for-user')
     async getUserCommunities(@Query('userId') userId: number) {
         return await this.communityService.getUserCommunities(userId);
     }

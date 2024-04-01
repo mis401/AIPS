@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { combineReducers } from 'redux';
 import authReducer from './authReducer';
 import calendarReducer from './communityReducer';
@@ -8,7 +9,17 @@ const rootReducer = combineReducers({
   community: communityReducer,
   //ostali reduceri
 });
+=======
+// import { combineReducers } from 'redux';
+// import authReducer from './authReducer';
 
-export type RootState = ReturnType<typeof rootReducer>;
+// const rootReducer = combineReducers({
+//   auth: authReducer,
+//   //ostali reduceri
+// });
+>>>>>>> origin
 
-export default rootReducer;
+// export type RootState = ReturnType<typeof rootReducer>;
+
+// export default rootReducer;
+export {}
