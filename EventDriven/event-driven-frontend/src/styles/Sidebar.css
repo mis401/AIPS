@@ -24,7 +24,7 @@
     border-radius: 50%;
     margin-bottom: 10px;
   }
-  
+
   .user-info h3 {
     margin: 0;
     font-size: 1.2em;
@@ -65,7 +65,9 @@
     margin-bottom: 20px; /* Odstojanje između krugova */
     font-size: 1em; /* Prilagodite veličinu fonta ako je potrebno */
     color: white; /* Boja teksta unutar kruga */
+    cursor: pointer;
 }
+
 .add-community {
     position: absolute; /* Pozicionira dugme na dnu sidebar-a */
     bottom: 20px; /* Odstojanje dugmeta od dna */
@@ -76,6 +78,8 @@
     margin: 0 auto; /* Centriranje unutar sidebar-a */
     border-radius: 50%; /* Ovo stvara krug */
 }
+
+
 
 .add-community button {
     background-color: #35529b;

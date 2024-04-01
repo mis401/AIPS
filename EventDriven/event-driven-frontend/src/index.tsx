@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import rootReducer from './redux/rootReducer'; // Pretpostavljajući da postoji rootReducer
+//import rootReducer from './redux/rootReducer'; // Pretpostavljajući da postoji rootReducer
 import store from './redux/store';
 
 

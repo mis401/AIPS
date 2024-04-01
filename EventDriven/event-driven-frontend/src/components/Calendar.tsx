@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Day from "./Day";
 import "../styles/Calendar.css";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export interface DayObject {
   day: number;
@@ -8,6 +10,8 @@ export interface DayObject {
 }
 
 const Calendar: React.FC = () => {
+  
+  const community = useSelector((state: any) => state.community.selectedCommunity);
   const MONTH_NAMES: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const DAYS: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -99,7 +103,8 @@ const Calendar: React.FC = () => {
       <div className="calendar">
         <div className="header">
           <div>
-            <label> Ime zajednice </label>
+
+           <label>{community ? community.name : ""}</label>
           </div>
 
           <div className="monthChangerDiv">

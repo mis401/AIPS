@@ -20,7 +20,7 @@ function IconsBar() {
 
     const handleSignOut = async() => {
         try{
-            const response = await fetch('auth/signout',{
+            const response = await fetch('http://localhost:8000/auth/signout',{
                 method:'GET',
             });
 
