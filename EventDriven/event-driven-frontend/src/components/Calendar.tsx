@@ -15,6 +15,8 @@ const Calendar: React.FC = () => {
   const [year, setYear] = useState<number>(0);
   const [selectedDate, setSelectedDate] = useState<DayObject | null>(null);
 
+  const today = new Date();
+
   useEffect(() => {
     const today = new Date();
     setMonth(today.getMonth());
@@ -76,8 +78,6 @@ const Calendar: React.FC = () => {
   const handleDateClick = (day: DayObject) => {
     setSelectedDate(day);
     console.log(`Selected date: ${year}-${month + 1}-${day.day}`);
-
-    //otvaranje dokumenta
   };
 
   const handleMonthChange = (increment: number) => {
@@ -121,6 +121,7 @@ const Calendar: React.FC = () => {
                   key={dayIndex}
                   day={day}
                   isSelected={day === selectedDate}
+                  isCurrentDay={day.isCurrentMonth && day.day === today.getDate() && month === today.getMonth() && year === today.getFullYear()}
                   onDateClick={handleDateClick}
                 />
               ))}

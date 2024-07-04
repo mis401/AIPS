@@ -10,7 +10,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import TextSnippetRoundedIcon from '@mui/icons-material/TextSnippetRounded';
 
-// const options = ['Text Document', 'To-do List', 'Whiteboard'];
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -31,12 +30,15 @@ function SimpleDialog(props: SimpleDialogProps) {
   };
 
   const handleListItemClick = (value: string) => {
-    onClose(value);
+    // onClose(value);
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>{title}</DialogTitle>
+      <div className='dialogTop'>
+        <DialogTitle>{title}</DialogTitle>
+        <Button onClick={handleClose}>x</Button>
+      </div>
       <List sx={{ pt: 0 }}>
         {options.map((option) => (
           <ListItem disableGutters key={option}>
