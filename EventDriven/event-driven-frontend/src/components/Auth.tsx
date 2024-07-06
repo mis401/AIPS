@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
-import { useNavigate } from "react-router-dom";
-import { error } from "console";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);
     const navigate = useNavigate();
+
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
     
     const handleSignInClick = () => setSignIn(false);
     const handleSignUpClick = () => setSignIn(true);

@@ -45,3 +45,7 @@
     color: #e4e4e4;
   }
   
+  .btn{
+    border-radius: 10px;
+    align-self: center;
+  }
