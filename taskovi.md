@@ -1,21 +1,26 @@
 # Mihajlo
 - ~~model~~
-- CRUD
-- guard
+- CRUD generalno
+- ~~jwt guard~~
+- role guard?
+- ~~crud za user, event~~
+
 
 # Kristina
 - ~~landing page~~
 - ~~kalendar~~
 - interceptor
-- instalacija redux
+- ~~instalacija redux~~
 - cuvanje jwt local/cookie
+- ~~otvaranje dokumenata~~
 
 # Andjelija
 - ~~login nakon signup~~
-- ~~signup, signin~~, signout
+- ~~signup, signin, signout~~
 - ~~povezivanje auth~~
 - autorizovane rute
 - ~~routing~~
+- react redux
 
 
 
@@ -32,3 +37,10 @@
     - CRUD za dokumenta
     - CRUD za zajednice
     - ceo layout
+      
+## taskovi za treću fazu
+    - funkcija za vracanje dogadjaja
+    - react redux u svim komponentama
+    - dokumenti: otvaranje, manipulacija
+    - rabbit mq instalacija
+    - čet, obaveštenja

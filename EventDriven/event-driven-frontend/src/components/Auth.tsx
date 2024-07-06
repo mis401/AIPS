@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
+//import { User } from '../redux/authTypes'
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from "../redux/authReducer";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
@@ -20,6 +24,10 @@ function Auth(){
         confirmPassword: '',
     });
 
+    // const setUser = (userData: User) => ({
+    //     type: 'LOGIN_SUCCESS',
+    //     payload: userData,
+    //   });
 
     const handleFieldChange = (fieldName: string, value: string) => {
         setFormData((prevData) => ({
@@ -78,7 +86,13 @@ function Auth(){
             });
 
             if(response.ok) {
+                const userData = await response.json();
+                console.log('UserData after successful login:', userData);
+                console.log(userData)
+                dispatch(loginSuccess(userData.user));
+                console.log('User data dispatched:', userData);
                 navigate('/home');
+                
             } else {
                 const errorData = await response.json();
 

@@ -28,3 +28,7 @@
 .msg:hover{
     background-color: #4299e1;
 }
+
+.logout:hover {
+    cursor: pointer;
+}

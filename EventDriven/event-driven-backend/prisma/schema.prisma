@@ -30,7 +30,7 @@ model User {
 
 model Community {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String @unique
   createdAt DateTime @default(now())
   members User[] @relation("memberOf")
   createdUser User @relation("createdUser", fields: [createdUserId], references: [id])
@@ -46,7 +46,7 @@ model Calendar {
   name     String
   community Community? @relation("calendarOf")
   documents Document[]
-  event Event[]
+  events Event[]
 }
 
 model Document {

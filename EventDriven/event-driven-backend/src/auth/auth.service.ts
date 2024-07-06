@@ -34,22 +34,22 @@ export class AuthService {
     return {message: 'signup was successful'};
     }
 
-    async signin(dto: SignInDto, req: Request, res: Response){
-        const {email,password} = dto;
+    async signin(foundUser, res: Response){
+        // const {email,password} = dto;
 
-        const foundUser = await this.prisma.user.findUnique({where:{email}})
-        if(!foundUser){
-            throw new BadRequestException('Wrong credentials')
-        }
+        // const foundUser = await this.prisma.user.findUnique({where:{email}})
+        // if(!foundUser){
+        //     throw new BadRequestException('Wrong credentials')
+        // }
 
-        const isMatch = await this.comparePasswords(
-            {
-                password, 
-                hash: foundUser.hashedPassword
-            });
-        if(!isMatch){
-            throw new BadRequestException('Wrong credentials')
-        }
+        // const isMatch = await this.comparePasswords(
+        //     {
+        //         password, 
+        //         hash: foundUser.hashedPassword
+        //     });
+        // if(!isMatch){
+        //     throw new BadRequestException('Wrong credentials')
+        // }
 
         //sign jwt and return to the user
         const token = await this.signToken(
@@ -64,7 +64,9 @@ export class AuthService {
 
         res.cookie('token', token);
         
-        return res.send({message: 'Logged in successfully'});
+        return res.send({
+            user: foundUser,
+        });
     }
 
     async singout(req: Request, res:Response) {
@@ -85,5 +87,22 @@ export class AuthService {
         const payload = args
 
         return this.jwt.signAsync(payload, {secret: JwtSecret})
+    }
+
+    async validateUser(email:string, password: string) {
+        console.log("Auth service validating");
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        });
+        console.log("User found");
+        console.log(user);
+        if (user && await bcrypt.compare(password, user.hashedPassword)) {
+            const {hashedPassword, ...result} = user;
+            return result;
+        }
+        console.log("validation failed");
+        return null;
     }
 }

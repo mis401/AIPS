@@ -4,9 +4,11 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useState } from 'react';
 import Window from './Window';
+import { useNavigate } from "react-router-dom";
 
 function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const navigate = useNavigate();
 
 
     const openSettingsWindow = () => {
@@ -17,7 +19,24 @@ function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
         setIsSettingsOpen(false);
     }
 
+    const handleSignOut = async() => {
+        try{
+            const response = await fetch('auth/signout',{
+                method:'GET',
+            });
 
+            if(response.ok){
+                navigate('/auth');
+            } else {
+                const errorData = await response.json();
+
+                console.error('Signout failed: ', errorData.message);
+            }
+        }
+        catch (error) {
+            console.error('Fetch error:', error);
+        }
+    }
     return (
         <div className="icons-bar">
             <NotificationsIcon className='icon' sx={{
@@ -36,7 +55,7 @@ function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
 
             {isSettingsOpen && (
                 <Window onClose={closeSettingsWindow}>
-                    <p>Log out</p>
+                    <p className="logout" onClick={handleSignOut}>Log out</p>
                 </Window>
             )}
 
