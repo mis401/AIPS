@@ -71,14 +71,18 @@ export class AuthService {
         return await bcrypt.compare(args.password, args.hash);
     }
 
-    async signTokens(args: {id:number, email:string}){
-        const payload = args
-
-        const token =  this.jwt.signAsync(payload, {secret: JwtSecret, expiresIn: '15min'});
-        const refreshToken = this.jwt.signAsync(payload, {secret: JwtRefreshSecret, expiresIn: '7d'});
-
-        return {token, refreshToken};
+    async signTokens(args: { id: number; email: string }) {
+        const payload = args;
+        
+        try {
+            const token = await this.jwt.signAsync(payload, { secret: JwtSecret, expiresIn: '15min' });
+            const refreshToken = await this.jwt.signAsync(payload, { secret: JwtRefreshSecret, expiresIn: '7d' });
+            return { token, refreshToken };
+        } catch (error) {
+            throw new Error('Token signing failed');
+        }
     }
+    
 
     async refreshTokens(refreshToken: string, res: Response) {
         try {
@@ -86,9 +90,9 @@ export class AuthService {
 
             const { token, refreshToken: newRefreshToken } = await this.signTokens({ id: payload.id, email: payload.email });
 
-            res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); //dali treba secure
-            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-
+            res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+            
             return { token, refreshToken: newRefreshToken };
         } catch (e) {
             throw new ForbiddenException('Invalid refresh token');

@@ -9,12 +9,9 @@
 # Kristina
 - ~~landing page~~
 - ~~kalendar~~
-- interceptor
+- ~~interceptor~~
 - ~~instalacija redux~~
-- cuvanje jwt local/cookie
-<<<<<<< HEAD
-- otvaranje dokumenata
-=======
+- ~~cuvanje jwt local/cookie~~
 - ~~otvaranje dokumenata~~
 >>>>>>> main
 
@@ -22,7 +19,7 @@
 - ~~login nakon signup~~
 - ~~signup, signin, signout~~
 - ~~povezivanje auth~~
-- autorizovane rute
+- ~~autorizovane rute~~
 - ~~routing~~
 - react redux
 
