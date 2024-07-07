@@ -105,6 +105,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
           <div>
             <label>{communityName || 'Ime zajednice'}</label>
           </div>
+
           <div className="monthChangerDiv">
             <button onClick={() => handleMonthChange(-1)}>&lt;</button>
             <h2>{MONTH_NAMES[month]} {year}</h2>

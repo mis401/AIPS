@@ -7,12 +7,13 @@ import Calendar from './components/Calendar';
 import Unauthorized from './components/Unauthorized';
 import RequireAuth from './components/RequireAuth';
 import { AuthProvider } from './context/AuthProvider';
+import Welcome from './components/Welcome'
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* <Route path='/' element={ <Welcome /> } /> */}
+        <Route path='/' element={ <Welcome /> } />
         <Route path='auth' element={ <Auth /> } />
         <Route path='home' element={ <Home />} />
         <Route path='unauthorized' element={ <Unauthorized /> } />
