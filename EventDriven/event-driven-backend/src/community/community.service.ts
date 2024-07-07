@@ -1,38 +1,29 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { PrismaService } from 'prisma/prisma.service';
-import { NotFoundError } from 'rxjs';
-import { v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CommunityService {
     constructor(private prisma: PrismaService) {}
 
     async getUserCommunities(userId: number) {
-<<<<<<< HEAD
-        return await this.prisma.user.findMany({
-=======
         const comms = await this.prisma.user.findFirst({
->>>>>>> main
             where: {
-                id: userId
+                id: userId,
             },
             select: {
                 communities: {
                     select: {
                         id: true,
                         name: true,
-<<<<<<< HEAD
-=======
                         code: true,
->>>>>>> main
                         members: {
                             select: {
                                 id: true,
                                 firstName: true,
                                 lastName: true,
                                 email: true,
-                            }
+                            },
                         },
                         createdUser: {
                             select: {
@@ -40,7 +31,7 @@ export class CommunityService {
                                 firstName: true,
                                 lastName: true,
                                 email: true,
-                            }
+                            },
                         },
                         // calendar: {
                         //     include: {
@@ -50,8 +41,8 @@ export class CommunityService {
                         //                 name: true,
                         //                 start: true,
                         //                 end: true,
-                        //                 color: true
-                        //             }
+                        //                 color: true,
+                        //             },
                         //         },
                         //         documents: {
                         //             select: {
@@ -66,31 +57,34 @@ export class CommunityService {
                         //                         firstName: true,
                         //                         lastName: true,
                         //                         id: true,
-                        //                     }
-                        //                 }
-                        //             }
-                        //         }
-                        //     }
-                        // }
-                    }
-                }
-            }
-        })
-<<<<<<< HEAD
-=======
+                        //                     },
+                        //                 },
+                        //             },
+                        //         },
+                        //     },
+                        // },
+                    },
+                },
+            },
+        });
+
+        if (!comms) {
+            throw new NotFoundException('User not found');
+        }
+
         return comms.communities;
->>>>>>> main
     }
 
     async getCommunity(id: number) {
-        try{
+        try {
             const communityId = Number(id);
             if (isNaN(communityId)) {
-                throw new Error('Invalid community id')
+                throw new BadRequestException('Invalid community id');
             }
+
             const community = await this.prisma.community.findUnique({
                 where: {
-                    id: communityId
+                    id: communityId,
                 },
                 include: {
                     members: {
@@ -99,7 +93,7 @@ export class CommunityService {
                             firstName: true,
                             lastName: true,
                             email: true,
-                        }
+                        },
                     },
                     createdUser: {
                         select: {
@@ -107,7 +101,7 @@ export class CommunityService {
                             firstName: true,
                             lastName: true,
                             email: true,
-                        }
+                        },
                     },
                     calendar: {
                         include: {
@@ -117,8 +111,8 @@ export class CommunityService {
                                     name: true,
                                     start: true,
                                     end: true,
-                                    color: true
-                                }
+                                    color: true,
+                                },
                             },
                             documents: {
                                 select: {
@@ -133,39 +127,39 @@ export class CommunityService {
                                             firstName: true,
                                             lastName: true,
                                             id: true,
-                                        }
-                                    }
-                                }
-                                }
+                                        },
+                                    },
+                                },
                             },
-                        }
-                    }
-                }
-            )
+                        },
+                    },
+                },
+            });
+
             if (!community) {
-                throw new NotFoundException('Community not found')
+                throw new NotFoundException('Community not found');
             }
+
             return community;
-        }
-        catch (e) {
+        } catch (e) {
             console.log(e.message);
-            throw e
+            throw e;
         }
     }
 
     async joinCommunity(userId: number, communityCode: string) {
         return await this.prisma.community.update({
             where: {
-                code: communityCode
+                code: communityCode,
             },
             data: {
                 members: {
                     connect: {
-                        id: userId
-                    }
-                }
-            }
-        })
+                        id: userId,
+                    },
+                },
+            },
+        });
     }
 
     async leaveCommunity(userId: number, communityId: number) {
@@ -176,67 +170,71 @@ export class CommunityService {
             data: {
                 members: {
                     disconnect: {
-                        id: userId
-                    }
-                }
+                        id: userId,
+                    },
+                },
             },
-            include:{
-                members: true
-            }
-        })
+            include: {
+                members: true,
+            },
+        });
+
         if (community.members.length === 0) {
             return await this.prisma.community.delete({
                 where: {
-                    id: communityId
-                }
-            })
-        }
-        else
+                    id: communityId,
+                },
+            });
+        } else {
             return community;
+        }
     }
 
     async createCommunity(name: string, userId: number) {
-        try{
+        try {
             const existingCommunity = await this.prisma.community.findUnique({
                 where: {
-                    name: name
-                }
-            })
+                    name: name,
+                },
+            });
+
             if (existingCommunity) {
-                throw new Error('Community already exists')
+                throw new BadRequestException('Community already exists');
             }
+
             const calendar = await this.prisma.calendar.create({
                 data: {
                     name: name,
                 },
-            })
+            });
+
             let generatedCode: string = uuidv4();
             generatedCode = generatedCode.slice(0, 7);
+
             return await this.prisma.community.create({
                 data: {
                     name: name,
                     createdUser: {
                         connect: {
-                            id: userId
-                        }
+                            id: userId,
+                        },
                     },
                     calendar: {
                         connect: {
-                            id: calendar.id
-                        }
+                            id: calendar.id,
+                        },
                     },
                     members: {
                         connect: {
-                            id: userId
-                        }
+                            id: userId,
+                        },
                     },
-                    code: generatedCode
-                }
-            })
-        }
-        catch (e) {
+                    code: generatedCode,
+                },
+            });
+        } catch (e) {
             console.log(e.message);
-            throw new BadRequestException(e.message)
+            throw new BadRequestException(e.message);
         }
     }
 }

@@ -1,25 +1,17 @@
 import { useEffect, useState } from "react";
 import Day from "./Day";
 import "../styles/Calendar.css";
-import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 export interface DayObject {
   day: number;
   isCurrentMonth: boolean;
 }
 
-<<<<<<< HEAD
-const Calendar: React.FC = () => {
-  
-  const community = useSelector((state: any) => state.community.selectedCommunity);
-=======
 interface CalendarProps {
   communityName: string | null;
 }
 
 const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
->>>>>>> main
   const MONTH_NAMES: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const DAYS: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -111,14 +103,8 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
       <div className="calendar">
         <div className="header">
           <div>
-<<<<<<< HEAD
-
-           <label>{community ? community.name : ""}</label>
-=======
             <label>{communityName || 'Ime zajednice'}</label>
->>>>>>> main
           </div>
-
           <div className="monthChangerDiv">
             <button onClick={() => handleMonthChange(-1)}>&lt;</button>
             <h2>{MONTH_NAMES[month]} {year}</h2>
@@ -151,4 +137,3 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
 };
 
 export default Calendar;
-

@@ -6,15 +6,10 @@ export class CommunityController {
     constructor(private communityService: CommunityService) {}
     
     @Get('get-for-user')
-<<<<<<< HEAD
-    async getUserCommunities(@Query('userId') userId: number) {
-        return await this.communityService.getUserCommunities(userId);
-=======
     async getUserCommunities(@Query('userId') userId: string) {
         const res = await this.communityService.getUserCommunities(parseInt(userId));
         console.log(res);
         return res;
->>>>>>> main
     }
 
     @Get('get-community')
