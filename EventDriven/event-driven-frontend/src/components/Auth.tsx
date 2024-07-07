@@ -11,9 +11,6 @@ function Auth(){
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { setAuth } = useAuth();
-
-    // const location = useLocation();
-    // const from = location.state?.from?.pathname || "/";
     
     const handleSignInClick = () => setSignIn(false);
     const handleSignUpClick = () => setSignIn(true);
