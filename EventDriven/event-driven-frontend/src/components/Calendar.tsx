@@ -7,7 +7,11 @@ export interface DayObject {
   isCurrentMonth: boolean;
 }
 
-const Calendar: React.FC = () => {
+interface CalendarProps {
+  communityName: string | null;
+}
+
+const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
   const MONTH_NAMES: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const DAYS: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -99,7 +103,7 @@ const Calendar: React.FC = () => {
       <div className="calendar">
         <div className="header">
           <div>
-            <label> Ime zajednice </label>
+            <label>{communityName || 'Ime zajednice'}</label>
           </div>
 
           <div className="monthChangerDiv">
@@ -134,3 +138,4 @@ const Calendar: React.FC = () => {
 };
 
 export default Calendar;
+

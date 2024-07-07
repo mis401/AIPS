@@ -1,66 +1,72 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import TextSnippetRoundedIcon from '@mui/icons-material/TextSnippetRounded';
+import React, { useState } from 'react';
 
-
-export interface SimpleDialogProps {
+interface SimpleDialogProps {
   open: boolean;
-  selectedValue: string;
   onClose: (value: string) => void;
   selectedOption: string | null;
   onCreateButtonClick: () => void;
   title: string;
   options: string[];
   buttonText: string;
+  onNewCommunityNameChange: (name: string) => void;
 }
 
-function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open, selectedOption, onCreateButtonClick, title, options, buttonText } = props;
+const SimpleDialog: React.FC<SimpleDialogProps> = ({
+  open,
+  onClose,
+  selectedOption,
+  onCreateButtonClick,
+  title,
+  options,
+  buttonText,
+  onNewCommunityNameChange,
+}) => {
+  const [communityName, setCommunityName] = useState('');
 
-  const handleClose = () => {
-    onClose(selectedValue);
+  const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onClose(event.target.value);
   };
 
-  const handleListItemClick = (value: string) => {
-    // onClose(value);
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCommunityName(event.target.value);
+    onNewCommunityNameChange(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    onCreateButtonClick();
   };
 
   return (
-    <Dialog onClose={handleClose} open={open}>
-      <div className='dialogTop'>
-        <DialogTitle>{title}</DialogTitle>
-        <Button onClick={handleClose}>x</Button>
+    open ? (
+      <div className="dialog">
+        <h2>{title}</h2>
+        <select value={selectedOption || ''} onChange={handleOptionChange}>
+          <option value="" disabled>Select an option</option>
+          {options.map((option, index) => (
+            <option key={index} value={option}>{option}</option>
+          ))}
+        </select>
+        {selectedOption === 'Create a community' && (
+          <>
+            <input
+              type="text"
+              placeholder="Enter community name"
+              value={communityName}
+              onChange={handleInputChange}
+            />
+            <button onClick={handleSubmit}>{buttonText}</button>
+          </>
+        )}
+        {selectedOption === 'Join a community' && (
+          <input
+            type="text"
+            placeholder="Enter community code"
+            onChange={handleInputChange}
+          />
+        )}
       </div>
-      <List sx={{ pt: 0 }}>
-        {options.map((option) => (
-          <ListItem disableGutters key={option}>
-            <ListItemButton
-              selected={option === selectedOption}
-              onClick={() => handleListItemClick(option)}
-            >
-              <ListItemAvatar>
-                <Avatar>
-                  <TextSnippetRoundedIcon style={{ color: 'secondary' }} />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={option} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-        <div className='createButtonDiv'>
-          <Button onClick={onCreateButtonClick}>{buttonText}</Button>
-        </div>
-      </List>
-    </Dialog>
+    ) : null
   );
-}
+};
 
 export default SimpleDialog;

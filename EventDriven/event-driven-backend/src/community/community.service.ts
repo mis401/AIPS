@@ -8,7 +8,7 @@ export class CommunityService {
     constructor(private prisma: PrismaService) {}
 
     async getUserCommunities(userId: number) {
-        return await this.prisma.user.findMany({
+        const comms = await this.prisma.user.findFirst({
             where: {
                 id: userId
             },
@@ -67,6 +67,7 @@ export class CommunityService {
                 }
             }
         })
+        return comms.communities;
     }
 
     async getCommunity(id: number) {

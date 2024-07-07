@@ -1,65 +1,86 @@
-import React, { useEffect } from 'react';
-import { connect, ConnectedProps, useSelector } from 'react-redux';
-//import { RootState } from '../redux/rootReducer';
-//import { User } from '../redux/authTypes';
-import SimpleDialog from './SimpleDialog';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import CommunityDialog from './CommunityDialog';
 
-// const mapStateToProps = (state: RootState) => ({
-//   user: state.auth.user
-// });
+interface SidebarProps {
+  onCommunitySelect: (communityName: string) => void;
+}
 
-
-
-//const connector = connect(mapStateToProps);
-
-//type PropsFromRedux = ConnectedProps<typeof connector>;
-
-//type SidebarProps = PropsFromRedux;
-
-export const Sidebar: React.FC = () => {
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [selectedOption, setSelectedOption] = React.useState<string | null>(null);
+export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [newCommunityName, setNewCommunityName] = useState<string>('');
+  const [communityCode, setCommunityCode] = useState<string>('');
   const userInState = useSelector((state: any) => state.auth.user);
-  const [communities, setCommunities] = React.useState<any[]>([]);
+  const [communities, setCommunities] = useState<any[]>([]);
+
   useEffect(() => {
     if (userInState !== null) {
       console.log('User prop changed:', userInState);
-      const response = fetch(`http://localhost:8000/community/get-all?${userInState.id}`, {
+      const response = fetch(`http://localhost:8000/community/get-for-user?userId=${userInState.id}`, {
         method: `GET`
-      })
+      });
       response.then(async (value) => {
-        if (value.ok){
+        if (value.ok) {
           const data = value.json();
           console.log(data);
           data.then((array) => {
+            console.log('Communities data:', array)
             setCommunities([...array]);
-          })
+          });
         }
-      })
+      });
     }
   }, [userInState]);
-  
-  // const communities: any[] = (async () => {
-  //   return await fetch(`http://localhost:8000/community/get-all?userId=${userInState.id}`, {
-  //     method: 'GET'
-  //   })
-  // })()
 
-
-  const addCommunityClick = () => {
-    setOpenDialog(true);
+  const handleDialogToggle = () => {
+    setOpenDialog(prevOpenDialog => !prevOpenDialog);  
   };
 
-  function handleDialogClose(value: string): void {
-    setSelectedOption(value);
+  function handleOptionChange(option: string) {
+    setSelectedOption(option);
   }
 
-  function handleCreateButtonClick(): void {
-    setOpenDialog(false);
+  function handleCreateButtonClick() {
+    if (selectedOption === 'Create a community') {
+      fetch('http://localhost:8000/community/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newCommunityName,
+          userId: userInState?.id,
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        setCommunities(prev => [...prev, data]);
+        setNewCommunityName('');
+        handleDialogToggle();  
+      });
+    } else if (selectedOption === 'Join a community') {
+      fetch('http://localhost:8000/community/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: communityCode,
+          userId: userInState?.id,
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        setCommunities(prev => [...prev, data]);
+        setCommunityCode('');
+        handleDialogToggle();  
+      });
+    }
   }
 
-  async function joinCommunity(){
-
+  const handleCommunityClick = (communityName: string) => {
+    onCommunitySelect(communityName);
   }
 
   return (
@@ -67,37 +88,37 @@ export const Sidebar: React.FC = () => {
       <div className="profile-section">
         <div className="profile-pic"></div>
         <div className="user-info">
-        <h3>{userInState ? `${userInState.firstName} ${userInState.lastName}` : 'Guest'}</h3>
+          <h3>{userInState ? `${userInState.firstName} ${userInState.lastName}` : 'Guest'}</h3>
           <p>{userInState ? userInState.email : 'email@example.com'}</p>
         </div>
       </div>
       <div className='scrollable-communities'>
         <div className="communities-section">
           {communities.map((community) => (
-            <div key={community.id} className="community">
+            <div key={community.id} className="community" onClick={() => handleCommunityClick(community.name)}>
               <span>{community.name}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="add-community" >
-        <button onClick={addCommunityClick}>+</button>
+      <div className="add-community">
+        <button onClick={handleDialogToggle}>+</button> 
       </div>
 
-      <SimpleDialog
-        selectedValue=""
+      <CommunityDialog
         open={openDialog}
-        onClose={handleDialogClose}
+        onClose={handleDialogToggle}  // Toggle dialog open/close
         selectedOption={selectedOption}
         onCreateButtonClick={handleCreateButtonClick}
         title="Add a new community"
         options={['Join a community', 'Create a community']}
         buttonText='Done'
+        onNewCommunityNameChange={(name) => setNewCommunityName(name)}
+        onCommunityCodeChange={(code) => setCommunityCode(code)}
+        onOptionChange={handleOptionChange}  
       />
-      
     </aside>
   );
 };
 
 export default Sidebar;
-//export default connector(Sidebar);

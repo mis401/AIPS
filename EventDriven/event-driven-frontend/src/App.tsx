@@ -14,11 +14,10 @@ function App() {
       <Routes>
         <Route path='/' element={ <Welcome /> } />
         <Route path='auth' element={ <Auth /> } />
+        <Route path='home' element={ <Home />} />
         <Route path='unauthorized' element={ <Unauthorized /> } />
 
-        <Route element={ <RequireAuth /> }>
-          <Route path='home' element= { <Home /> } /> 
-        </Route>
+        
       </Routes>
     </AuthProvider>
   );
