@@ -60,13 +60,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
         handleDialogToggle();  
       });
     } else if (selectedOption === 'Join a community') {
+      console.log("Comm code: ", communityCode);
       fetch('http://localhost:8000/community/join', {
-        method: 'POST',
+        method: 'PUT',  
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          code: communityCode,
+          communityCode: communityCode,
           userId: userInState?.id,
         }),
       })
@@ -75,8 +76,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
         setCommunities(prev => [...prev, data]);
         setCommunityCode('');
         handleDialogToggle();  
+      })
+      .catch(error => {
+        console.error('Error:', error);
       });
     }
+    
   }
 
   const handleCommunityClick = (communityName: string) => {

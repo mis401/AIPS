@@ -8,7 +8,7 @@ export class NotificationsListenerService {
   private readonly logger = new Logger(NotificationsListenerService.name);
 
   constructor(
-    @Inject('NOTIFICATIONS_SERVICE') private readonly client: ClientProxy,  // Dodaj @Inject za ClientProxy
+    @Inject('NOTIFICATIONS_SERVICE') private readonly client: ClientProxy,  
   ) {}
 
   @OnEvent('community.join')

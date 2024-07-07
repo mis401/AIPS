@@ -12,6 +12,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationsListenerService } from './notification/notification.listener.service';
 import { CommunityService } from './community/community.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { NotificationsGateway } from './notification/notification.gateway';
 
 @Module({
   controllers: [AppController],
@@ -21,6 +22,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     FilesysService, 
     CommunityService, 
     NotificationsListenerService,
+    NotificationsGateway,
   ],
 
   imports: [

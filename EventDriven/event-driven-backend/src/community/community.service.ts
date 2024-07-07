@@ -152,40 +152,57 @@ export class CommunityService {
     }
 
     async joinCommunity(userId: number, communityCode: string) {
+        console.log('joinCommunity called with:', { userId, communityCode });
+    
+        if (!communityCode) {
+            throw new BadRequestException('Community code must be provided');
+        }
+    
         const community = await this.prisma.community.findUnique({
             where: {
                 code: communityCode,
             }
         });
+    
         const user = await this.prisma.user.findUnique({
             where: {
                 id: userId,
             }
-        })
-
-        if(!community){
-            throw new Error('Zajednica ne postoji');
+        });
+    
+        if (!community) {
+            throw new NotFoundException('Community does not exist');
         }
-        if(!user){
-            throw new Error('User ne postoji');
+        if (!user) {
+            throw new NotFoundException('User does not exist');
         }
-
-        this.eventEmitter.emit('community.join', new JoinCommunityEvent(community.id.toString(), community.name, userId.toString(), user.firstName, user.lastName));
-        
-        return await this.prisma.community.update({
-            where: {
-                code: communityCode,
-            },
-            data: {
-                members: {
-                    connect: {
-                        id: userId,
+    
+        this.eventEmitter.emit('community.join', new JoinCommunityEvent(
+            community.id.toString(),
+            community.name,
+            userId.toString(),
+            user.firstName,
+            user.lastName,
+        ));
+    
+        try {
+            return await this.prisma.community.update({
+                where: {
+                    code: communityCode,
+                },
+                data: {
+                    members: {
+                        connect: {
+                            id: userId,
+                        },
                     },
                 },
-            },
-        });
-        
+            });
+        } catch (error) {
+            console.error('Error updating community:', error);
+        }
     }
+    
 
     async leaveCommunity(userId: number, communityId: number) {
         const community = await this.prisma.community.update({
