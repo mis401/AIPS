@@ -22,4 +22,10 @@ export class AuthController {
   signout( @Req() req, @Res() res) {
     return this.authService.singout(req, res); 
   }
+
+  @Post('refresh-token')
+  refreshTokens(@Body('refreshToken') refreshToken: string, @Res() res){
+    return this.authService.refreshTokens(refreshToken, res);
+  }
+
 }

@@ -3,7 +3,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { SignInDto, SignUpDto } from './dto/auth.dto';
 import *  as bcrypt from 'bcrypt'
 import {JwtService} from '@nestjs/jwt'
-import { JwtSecret } from '../utils/constants'
+import { JwtSecret, JwtRefreshSecret } from '../utils/constants'
 import { Response } from 'express';
 import { Request } from 'express';
  
@@ -31,38 +31,24 @@ export class AuthService {
             }
         })
 
-    return {message: 'signup was successful'};
+        return {message: 'signup was successful'};
     }
 
     async signin(foundUser, res: Response){
-        // const {email,password} = dto;
-
-        // const foundUser = await this.prisma.user.findUnique({where:{email}})
-        // if(!foundUser){
-        //     throw new BadRequestException('Wrong credentials')
-        // }
-
-        // const isMatch = await this.comparePasswords(
-        //     {
-        //         password, 
-        //         hash: foundUser.hashedPassword
-        //     });
-        // if(!isMatch){
-        //     throw new BadRequestException('Wrong credentials')
-        // }
 
         //sign jwt and return to the user
-        const token = await this.signToken(
+        const {token, refreshToken} = await this.signTokens(
             {
                 id: foundUser.id, 
                 email: foundUser.email
             });
 
-        if( !token){
+        if( !token || !refreshToken){
             throw new ForbiddenException()
         }
 
-        res.cookie('token', token);
+        res.cookie('token', token, {httpOnly: true, secure: true});
+        res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true});
         
         return res.send({
             user: foundUser,
@@ -70,7 +56,9 @@ export class AuthService {
     }
 
     async singout(req: Request, res:Response) {
-        res.clearCookie('token');
+        res.clearCookie('token', {httpOnly: true, secure: true});
+        res.clearCookie('refreshToken', {httpOnly: true, secure: true});
+
         return res.send({message: 'Logged out successfully'})
     }
 
@@ -83,10 +71,28 @@ export class AuthService {
         return await bcrypt.compare(args.password, args.hash);
     }
 
-    async signToken(args: {id:number, email:string}){
+    async signTokens(args: {id:number, email:string}){
         const payload = args
 
-        return this.jwt.signAsync(payload, {secret: JwtSecret})
+        const token =  this.jwt.signAsync(payload, {secret: JwtSecret, expiresIn: '15min'});
+        const refreshToken = this.jwt.signAsync(payload, {secret: JwtRefreshSecret, expiresIn: '7d'});
+
+        return {token, refreshToken};
+    }
+
+    async refreshTokens(refreshToken: string, res: Response) {
+        try {
+            const payload = await this.jwt.verifyAsync(refreshToken, { secret: JwtRefreshSecret });
+
+            const { token, refreshToken: newRefreshToken } = await this.signTokens({ id: payload.id, email: payload.email });
+
+            res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' }); //dali treba secure
+            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+
+            return { token, refreshToken: newRefreshToken };
+        } catch (e) {
+            throw new ForbiddenException('Invalid refresh token');
+        }
     }
 
     async validateUser(email:string, password: string) {
@@ -97,7 +103,7 @@ export class AuthService {
             }
         });
         console.log("User found");
-        console.log(user);
+
         if (user && await bcrypt.compare(password, user.hashedPassword)) {
             const {hashedPassword, ...result} = user;
             return result;
@@ -105,4 +111,5 @@ export class AuthService {
         console.log("validation failed");
         return null;
     }
+      
 }
