@@ -17,7 +17,13 @@ function App() {
         <Route path='home' element={ <Home />} />
         <Route path='unauthorized' element={ <Unauthorized /> } />
 
+<<<<<<< HEAD
         
+=======
+        <Route element={ <RequireAuth allowedRoles={["USER","MANAGER"]} /> }>
+          <Route path='home' element= { <Home /> } /> 
+        </Route>
+>>>>>>> adb39a7ea772c5aef1f53871812620dcf0b51441
       </Routes>
     </AuthProvider>
   );
