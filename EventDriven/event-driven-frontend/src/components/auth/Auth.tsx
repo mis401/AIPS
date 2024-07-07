@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import '../styles/Auth.css'
+import '../../styles/Auth.css'
 import { useDispatch } from 'react-redux';
-import { loginSuccess } from "../redux/authReducer";
+import { loginSuccess } from "../../redux/authReducer";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 function Auth() {
     const [signIn, setSignIn] = useState<boolean>(true);
