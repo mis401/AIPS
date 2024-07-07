@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { PrismaService } from 'prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
+import { v4 as uuidv4} from 'uuid'
 
 @Injectable()
 export class CommunityService {
@@ -17,6 +18,7 @@ export class CommunityService {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                         members: {
                             select: {
                                 id: true,
@@ -141,10 +143,10 @@ export class CommunityService {
         }
     }
 
-    async joinCommunity(userId: number, communityId: number) {
+    async joinCommunity(userId: number, communityCode: string) {
         return await this.prisma.community.update({
             where: {
-                id: communityId,
+                code: communityCode
             },
             data: {
                 members: {
@@ -198,6 +200,8 @@ export class CommunityService {
                     name: name,
                 },
             })
+            let generatedCode: string = uuidv4();
+            generatedCode = generatedCode.slice(0, 7);
             return await this.prisma.community.create({
                 data: {
                     name: name,
@@ -215,7 +219,8 @@ export class CommunityService {
                         connect: {
                             id: userId
                         }
-                    }
+                    },
+                    code: generatedCode
                 }
             })
         }

@@ -39,6 +39,7 @@ model Community {
   calendarId Int @unique
   messages Message[]
   managers User[] @relation("managers")
+  code String @unique
 }
 
 model Calendar {

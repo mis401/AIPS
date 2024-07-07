@@ -13,13 +13,13 @@ export class CommunityController {
     }
 
     @Get('get-community')
-    async getCommunity(@Query('id') id: number) {
-        return await this.communityService.getCommunity(id);
+    async getCommunity(@Query('id') id: string) {
+        return await this.communityService.getCommunity(parseInt(id));
     }
 
     @Put('join')
-    async joinCommunity(@Body('userId') userId: number, @Body('communityId') communityId: number) {
-        return await this.communityService.joinCommunity(userId, communityId);
+    async joinCommunity(@Body('userId') userId: number, @Body('communityCode') communityCode: string) {
+        return await this.communityService.joinCommunity(userId, communityCode);
     }
 
     @Put('leave')
