@@ -1,10 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-
+import { JoinCommunityEvent } from 'src/events-mq/join-community-event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable()
 export class CommunityService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private readonly eventEmitter:EventEmitter2
+    ) {}
 
     async getUserCommunities(userId: number) {
         const comms = await this.prisma.user.findFirst({
@@ -148,6 +152,26 @@ export class CommunityService {
     }
 
     async joinCommunity(userId: number, communityCode: string) {
+        const community = await this.prisma.community.findUnique({
+            where: {
+                code: communityCode,
+            }
+        });
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+
+        if(!community){
+            throw new Error('Zajednica ne postoji');
+        }
+        if(!user){
+            throw new Error('User ne postoji');
+        }
+
+        this.eventEmitter.emit('community.join', new JoinCommunityEvent(community.id.toString(), community.name, userId.toString(), user.firstName, user.lastName));
+        
         return await this.prisma.community.update({
             where: {
                 code: communityCode,
@@ -160,6 +184,7 @@ export class CommunityService {
                 },
             },
         });
+        
     }
 
     async leaveCommunity(userId: number, communityId: number) {
