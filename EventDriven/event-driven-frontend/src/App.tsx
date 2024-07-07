@@ -7,15 +7,18 @@ import Home from './components/Home';
 import Unauthorized from './components/Unauthorized';
 import RequireAuth from './components/RequireAuth';
 import { AuthProvider } from './context/AuthProvider';
+import RedirectIfAuthenticated from './components/RedirectIfAuth';
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path='/' element={ <Welcome /> } />
-        <Route path='auth' element={ <Auth /> } />
-        <Route path='home' element={ <Home />} />
         <Route path='unauthorized' element={ <Unauthorized /> } />
+        
+        <Route element={<RedirectIfAuthenticated/>}>
+          <Route path='auth' element={ <Auth /> } />
+        </Route>
 
         <Route element={ <RequireAuth allowedRoles={["USER","MANAGER"]} /> }>
           <Route path='home' element= { <Home /> } /> 

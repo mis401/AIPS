@@ -5,11 +5,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useState } from 'react';
 import Window from './Window';
 import { useNavigate } from "react-router-dom";
+import useAuth from '../hooks/useAuth';
 
 function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const navigate = useNavigate();
-
+    const { logout } = useAuth();
 
     const openSettingsWindow = () => {
         setIsSettingsOpen(true);
@@ -23,10 +24,12 @@ function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
         try{
             const response = await fetch('auth/signout',{
                 method:'GET',
+                credentials: 'include',
             });
 
             if(response.ok){
                 navigate('/auth');
+                logout();
             } else {
                 const errorData = await response.json();
 
