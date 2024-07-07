@@ -1,18 +1,11 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import TextSnippetRoundedIcon from '@mui/icons-material/TextSnippetRounded';
+import React, { useState } from 'react';
 
+<<<<<<< HEAD
 export interface SimpleDialogProps {
+=======
+interface SimpleDialogProps {
+>>>>>>> main
   open: boolean;
-  selectedValue: string;
   onClose: (value: string) => void;
   selectedOption: string | null;
   onCreateButtonClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -20,6 +13,7 @@ export interface SimpleDialogProps {
   onNameChange: (value: string) => void;
   title: string;
   options: string[];
+<<<<<<< HEAD
   createButtonText: string;
   joinButtonText: string;
   firstInputLabel: string; 
@@ -50,15 +44,42 @@ function SimpleDialog(props: SimpleDialogProps) {
 
   const [firstInputValue, setFirstInputValue] = React.useState('');
   const [secondInputValue, setSecondInputValue] = React.useState('');
+=======
+  buttonText: string;
+  onNewCommunityNameChange: (name: string) => void;
+}
 
-  const handleClose = () => {
-    onClose(selectedValue);
+const SimpleDialog: React.FC<SimpleDialogProps> = ({
+  open,
+  onClose,
+  selectedOption,
+  onCreateButtonClick,
+  title,
+  options,
+  buttonText,
+  onNewCommunityNameChange,
+}) => {
+  const [communityName, setCommunityName] = useState('');
+>>>>>>> main
+
+  const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onClose(event.target.value);
   };
 
+<<<<<<< HEAD
   const handleFirstInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setFirstInputValue(value);
     onNameChange(value);
+=======
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCommunityName(event.target.value);
+    onNewCommunityNameChange(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    onCreateButtonClick();
+>>>>>>> main
   };
 
   const handleSecondInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +90,7 @@ function SimpleDialog(props: SimpleDialogProps) {
   
 
   return (
+<<<<<<< HEAD
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>{title}</DialogTitle>
       <List sx={{ pt: 0 }}>
@@ -93,7 +115,38 @@ function SimpleDialog(props: SimpleDialogProps) {
         </ListItem>
       </List>
     </Dialog>
+=======
+    open ? (
+      <div className="dialog">
+        <h2>{title}</h2>
+        <select value={selectedOption || ''} onChange={handleOptionChange}>
+          <option value="" disabled>Select an option</option>
+          {options.map((option, index) => (
+            <option key={index} value={option}>{option}</option>
+          ))}
+        </select>
+        {selectedOption === 'Create a community' && (
+          <>
+            <input
+              type="text"
+              placeholder="Enter community name"
+              value={communityName}
+              onChange={handleInputChange}
+            />
+            <button onClick={handleSubmit}>{buttonText}</button>
+          </>
+        )}
+        {selectedOption === 'Join a community' && (
+          <input
+            type="text"
+            placeholder="Enter community code"
+            onChange={handleInputChange}
+          />
+        )}
+      </div>
+    ) : null
+>>>>>>> main
   );
-}
+};
 
 export default SimpleDialog;

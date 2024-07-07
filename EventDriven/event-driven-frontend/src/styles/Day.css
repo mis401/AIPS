@@ -18,3 +18,13 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.currentDay{
+    background-color: #03a9f45c;
+    border-radius: 10px;
+}
+
+.dialogTop{
+    display: flex;
+    justify-content: center;
+}

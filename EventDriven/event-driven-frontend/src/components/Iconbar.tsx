@@ -6,9 +6,10 @@ import { useState } from 'react';
 import Window from './Window';
 import { useNavigate } from "react-router-dom";
 
-function IconsBar() {
+function IconsBar({toggleChatSidebar}: {toggleChatSidebar: () => void}) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const navigate = useNavigate();
+
 
     const openSettingsWindow = () => {
         setIsSettingsOpen(true);
@@ -43,7 +44,9 @@ function IconsBar() {
                 }}/>
             <Forum className='icon msg' sx={{
                     padding: '15px'
-                }} />
+                }}
+                onClick={toggleChatSidebar} 
+                />
             <SettingsIcon className='icon' sx={{
                     padding: '15px',
                     cursor: 'pointer'

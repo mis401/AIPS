@@ -12,7 +12,11 @@
 - interceptor
 - ~~instalacija redux~~
 - cuvanje jwt local/cookie
+<<<<<<< HEAD
 - otvaranje dokumenata
+=======
+- ~~otvaranje dokumenata~~
+>>>>>>> main
 
 # Andjelija
 - ~~login nakon signup~~

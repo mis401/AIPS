@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { DayObject } from './Calendar';
 import '../styles/Day.css';
+<<<<<<< HEAD
 import SimpleDialog, { SimpleDialogProps } from './SimpleDialog';
 import DayAddDialog from './DayAddDialog';
 import { useSelector } from 'react-redux';
 import store from '../redux/store';
+=======
+// import SimpleDialog, { SimpleDialogProps } from './SimpleDialog';
+import DocumentEditorDialog from './DocumentEditorDialog';
+>>>>>>> main
 
 interface DayProps {
   day: DayObject;
   isSelected: boolean;
+  isCurrentDay: boolean;
   onDateClick: (day: DayObject) => void;
 }
 
+<<<<<<< HEAD
 const Day: React.FC<DayProps> = ({ day, isSelected, onDateClick }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -23,21 +30,35 @@ const Day: React.FC<DayProps> = ({ day, isSelected, onDateClick }) => {
   console.log(communityInState);
   const hasCommunityWithNameNull = communityInState.some((community: any) => community.name === null);
   const community = useSelector((state: any) => state.community.selectedCommunity);
+=======
+const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick }) => {
+  // const [openDialog, setOpenDialog] = useState(false);
+  // const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [openEditor, setOpenEditor] = useState(false);
+
+>>>>>>> main
 
   const handleClick = () => {
     onDateClick(day);
   };
   
+<<<<<<< HEAD
+=======
+    const handleSaveDocument = (content: string, type: string) => {
+      console.log('Document saved:', { content, type });
+     };
+>>>>>>> main
 
-  const addDocumentClick = () => {
-    setOpenDialog(true);
-  };
+  // const addDocumentClick = () => {
+  //   setOpenDialog(true);
+  // };
 
-  const handleDialogClose: SimpleDialogProps['onClose'] = (value) => {
-    setSelectedOption(value);
-    
-  };
+  // const handleDialogClose: SimpleDialogProps['onClose'] = (value) => {
+  //   setSelectedOption(value);
+  //   setOpenDialog(false);
+  // };
 
+<<<<<<< HEAD
   const handleCreateButtonClick = async (documentName: string) => {
     try {
       const response = await fetch(`http://localhost:5019/document/create`, {
@@ -81,10 +102,16 @@ const Day: React.FC<DayProps> = ({ day, isSelected, onDateClick }) => {
       console.error('Greška:', error);
     }
   };
+=======
+  // const handleCreateButtonClick = () => {
+  //   setOpenDialog(false);
+  //   console.log(selectedOption);
+  // };
+>>>>>>> main
 
   return (
     <div
-      className={`day ${day.day === 0 ? 'empty' : ''} ${isSelected ? 'selected' : ''} `}
+      className={`day ${day.day === 0 ? 'empty' : ''} ${isSelected ? 'selected' : ''} ${isCurrentDay ? 'currentDay' : ''} `}
       onClick={handleClick}
     >
       <div className='dayEvents'>
@@ -93,16 +120,21 @@ const Day: React.FC<DayProps> = ({ day, isSelected, onDateClick }) => {
         </label>
       </div>
 
+<<<<<<< HEAD
        {!hasCommunityWithNameNull && (
       <button
         hidden = {!community || !(community.name)}
         className={`addEvent ${day.isCurrentMonth ? '' : 'faded'}`}
         onClick={addDocumentClick}
       >
+=======
+      <button className={`addEvent ${day.isCurrentMonth ? '' : 'faded'}`} onClick={() => setOpenEditor(true)}>
+>>>>>>> main
         +
       </button>
     )}
 
+<<<<<<< HEAD
     <DayAddDialog
             open={openDialog}
             onClose={(value) => {
@@ -116,6 +148,24 @@ const Day: React.FC<DayProps> = ({ day, isSelected, onDateClick }) => {
     {documentId && (
       <button onClick={openDocument}>Open Document</button> 
     )}
+=======
+      <DocumentEditorDialog
+        open={openEditor}
+        onClose={() => setOpenEditor(false)}
+        onSave={handleSaveDocument}
+      />
+
+      {/* <SimpleDialog
+        selectedValue=""
+        open={openDialog}
+        onClose={handleDialogClose}
+        selectedOption={selectedOption}
+        onCreateButtonClick={handleCreateButtonClick}
+        title="Create a new document"
+        options={['Text Document', 'To-do List', 'Whiteboard']}
+        buttonText='Create'
+      /> */}
+>>>>>>> main
     </div>
   );
 };

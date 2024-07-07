@@ -1,16 +1,22 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 export interface User {    firstName: string;
     lastName: string;
     email: string;
   }
 
 =======
+=======
+>>>>>>> main
 // export interface User {
 //     firstName: string;
 //     lastName: string;
 //     email: string;
 //   }
+<<<<<<< HEAD
 >>>>>>> origin
+=======
+>>>>>>> main
   
 //   export interface AuthState {
 //     user: User | null;

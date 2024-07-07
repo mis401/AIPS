@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 import '../styles/Auth.css'
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
+=======
+>>>>>>> main
 //import { User } from '../redux/authTypes'
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from "../redux/authReducer";
+import { useLocation, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 function Auth(){
     const [signIn, setSignIn] = useState<boolean>(true);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { setAuth } = useAuth();
+
+    // const location = useLocation();
+    // const from = location.state?.from?.pathname || "/";
     
     const handleSignInClick = () => setSignIn(false);
     const handleSignUpClick = () => setSignIn(true);
@@ -21,11 +30,14 @@ function Auth(){
         confirmPassword: '',
     });
 
+<<<<<<< HEAD
     // const setUser = (userData: User) => ({
     //     type: 'LOGIN_SUCCESS',
     //     payload: userData,
     //   });
 
+=======
+>>>>>>> main
     const handleFieldChange = (fieldName: string, value: string) => {
         setFormData((prevData) => ({
             ...prevData,
@@ -84,10 +96,17 @@ function Auth(){
 
             if(response.ok) {
                 const userData = await response.json();
+<<<<<<< HEAD
                 console.log('UserData after successful login:', userData);
                 console.log(userData)
                 dispatch(loginSuccess(userData.user));
                 console.log('User data dispatched:', userData);
+=======
+
+                dispatch(loginSuccess(userData.user));
+                setAuth({ user: userData.user });
+
+>>>>>>> main
                 navigate('/home');
                 
             } else {
