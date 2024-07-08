@@ -16,7 +16,7 @@
     border-radius: 8px;
     width: 80%;
     max-width: 500px;
-    height: 80%;
+    height: 70%;
     display: flex;
     flex-direction: column;
   }
@@ -109,4 +109,25 @@
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
+  }
+  .undo-button img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .undo-button.inactive {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .whiteboard-controls {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .line-width-slider {
+    display: flex;
+    align-items: center;
   }

@@ -4,6 +4,7 @@ import '../styles/DocumentEditorDialog.css';
 import textFileIcon from '../assets/images/text-file.png';
 import todoListIcon from '../assets/images/todo-list.png';
 import whiteboardIcon from '../assets/images/whiteboard.png';
+import undoIcon from '../assets/images/undo.png'; // Import the undo button image
 
 interface DocumentEditorDialogProps {
   open: boolean;
@@ -20,11 +21,13 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [lineWidth, setLineWidth] = useState(2); // Default line width
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const historyRef = useRef<ImageData[]>([]);
 
   useEffect(() => {
     if (!open) {
       setContent('');
       setTodoItems([]);
+      historyRef.current = [];
     }
   }, [open]);
 
@@ -82,6 +85,11 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
       const rect = canvas.getBoundingClientRect();
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        // Save current state to history before starting a new drawing action
+        historyRef.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        if (historyRef.current.length > 50) { // Limit history size
+          historyRef.current.shift();
+        }
         ctx.beginPath();
         ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         ctx.strokeStyle = color;
@@ -125,6 +133,19 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
 
   const handleLineWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLineWidth(Number(e.target.value));
+  };
+
+  const handleUndo = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx && historyRef.current.length > 0) {
+        const lastState = historyRef.current.pop();
+        if (lastState) {
+          ctx.putImageData(lastState, 0, 0);
+        }
+      }
+    }
   };
 
   if (!open) return null;
@@ -196,26 +217,28 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
               ></canvas>
               <div className="whiteboard-controls">
                 <div className="color-picker">
-                    <button onClick={toggleColorPicker} style={{ backgroundColor: color }} className="color-button">
+                  <button onClick={toggleColorPicker} style={{ backgroundColor: color }} className="color-button">
                     {showColorPicker && (
-                        <SketchPicker
+                      <SketchPicker
                         color={color}
                         onChangeComplete={handleColorChange}
                         disableAlpha
-                        />
+                      />
                     )}
-                    </button>
+                  </button>
                 </div>
                 <div className="line-width-slider">
-                    <label>Line Width: {lineWidth}</label>
-                    <input
+                  <input
                     type="range"
                     min="1"
                     max="10"
                     value={lineWidth}
                     onChange={handleLineWidthChange}
-                    />
+                  />
                 </div>
+                <button onClick={handleUndo} className={`undo-button ${historyRef.current.length === 0 ? 'inactive' : ''}`}>
+                  <img src={undoIcon} alt="Undo" />
+                </button> 
               </div>
             </div>
           )}

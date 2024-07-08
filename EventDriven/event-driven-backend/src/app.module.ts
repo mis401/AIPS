@@ -12,7 +12,12 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationsListenerService } from './notification/notification.listener.service';
 import { CommunityService } from './community/community.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+<<<<<<< HEAD
 import { NotificationsGateway } from './notification/notification.gateway';
+=======
+import { DocService } from './doc/doc.service';
+import { CollaborationGateway } from './socket/collaboration.gateway';
+>>>>>>> 831336a27e3a6489f8a02ff4ae76686444dc87ad
 
 @Module({
   controllers: [AppController],
@@ -22,7 +27,12 @@ import { NotificationsGateway } from './notification/notification.gateway';
     FilesysService, 
     CommunityService, 
     NotificationsListenerService,
+<<<<<<< HEAD
     NotificationsGateway,
+=======
+    DocService,
+    CollaborationGateway
+>>>>>>> 831336a27e3a6489f8a02ff4ae76686444dc87ad
   ],
 
   imports: [

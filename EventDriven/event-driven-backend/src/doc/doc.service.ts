@@ -63,6 +63,15 @@ export class DocService {
         }
     }
 
+    // async updateDocument(id: number, content: any) {
+    //     // Assuming you update the document content here
+    //     const updatedDoc = await this.prisma.document.update({
+    //       where: { id },
+    //       data: { content },
+    //     });
+    //     return updatedDoc;
+    //   }
+
     async getDocumentInformation(id: number) {
         try {
             const doc = await this.prisma.document.findUnique({
