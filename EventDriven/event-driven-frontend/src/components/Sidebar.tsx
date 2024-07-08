@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import CommunityDialog from './CommunityDialog';
+import useAuth from '../hooks/useAuth';
 
 interface SidebarProps {
   onCommunitySelect: (communityName: string) => void;
@@ -11,8 +12,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [newCommunityName, setNewCommunityName] = useState<string>('');
   const [communityCode, setCommunityCode] = useState<string>('');
-  const userInState = useSelector((state: any) => state.auth.user);
   const [communities, setCommunities] = useState<any[]>([]);
+  const [isCommunityWindowOpen, setIsCommunityWindowOpen] = useState(false);
+
+  //zamena za redux, za sada privremena
+  // const userInState = useSelector((state: any) => state.auth.user);
+  const { auth } = useAuth();
+  const userInState = auth?.user;
+
 
   useEffect(() => {
     if (userInState !== null) {
@@ -35,6 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
 
   const handleDialogToggle = () => {
     setOpenDialog(prevOpenDialog => !prevOpenDialog);  
+    setIsCommunityWindowOpen(prevState => !prevState);
   };
 
   function handleOptionChange(option: string) {
@@ -81,7 +89,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
         console.error('Error:', error);
       });
     }
-    
+    else{
+      handleDialogToggle();
+    }
+
   }
 
   const handleCommunityClick = (communityName: string) => {
@@ -106,22 +117,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
           ))}
         </div>
       </div>
-      <div className="add-community">
+      <div className={`add-community ${isCommunityWindowOpen ? 'inactive' : 'active'}`}>
         <button onClick={handleDialogToggle}>+</button> 
       </div>
 
-      <CommunityDialog
-        open={openDialog}
-        onClose={handleDialogToggle}  // Toggle dialog open/close
-        selectedOption={selectedOption}
-        onCreateButtonClick={handleCreateButtonClick}
-        title="Add a new community"
-        options={['Join a community', 'Create a community']}
-        buttonText='Done'
-        onNewCommunityNameChange={(name) => setNewCommunityName(name)}
-        onCommunityCodeChange={(code) => setCommunityCode(code)}
-        onOptionChange={handleOptionChange}  
-      />
+      {/* <div className={`${isCommunityWindowOpen ? 'active' : 'inactive'}`}> */}
+        <CommunityDialog
+          open={openDialog}
+          onClose={handleDialogToggle}  
+          selectedOption={selectedOption}
+          onCreateButtonClick={handleCreateButtonClick}
+          title="Add a new community"
+          options={['Join a community', 'Create a community']}
+          buttonText='Done'
+          onNewCommunityNameChange={(name) => setNewCommunityName(name)}
+          onCommunityCodeChange={(code) => setCommunityCode(code)}
+          onOptionChange={handleOptionChange}  
+        />  
+      {/* </div> */}
     </aside>
   );
 };

@@ -68,8 +68,6 @@
     cursor: pointer;
 }
 
-<<<<<<< HEAD
-=======
 .community button{
 cursor: pointer;
 }
@@ -78,7 +76,6 @@ cursor: pointer;
   background-color: #449d8d;
 }
 
->>>>>>> main
 .add-community {
     position: absolute; 
     bottom: 20px;
@@ -109,4 +106,12 @@ cursor: pointer;
 
 .add-community button:hover {
     background-color: #449d8d;
+}
+
+.active{
+  display: block;
+}
+
+.inactive{
+  display: none;
 }

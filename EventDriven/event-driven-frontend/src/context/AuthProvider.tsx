@@ -9,22 +9,24 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => { 
     const [auth, setAuth] = useState<{ user: User | null }>(() => {
-        const storedAuth = localStorage.getItem("auth");
+        const storedAuth = sessionStorage.getItem("auth");
         return storedAuth ? JSON.parse(storedAuth) : { user: null };  
     });
 
-    const logout = () => {
-        localStorage.removeItem("auth");
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
+    //koristi se sessionstorage jer se podaci brisu kada se zatvori tab
+
+    const logout = () => {  
+        sessionStorage.removeItem("auth");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("refreshToken");
         setAuth({ user: null });
     };
 
     useEffect(() => {
         const refreshToken = async () => {
-            const storedRefreshToken = localStorage.getItem("refreshToken");
+            const storedRefreshToken = sessionStorage.getItem("refreshToken");
             if (!storedRefreshToken) return;
 
             const response = await fetch("http://localhost:8000/auth/refresh-token", {
@@ -37,9 +39,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem("auth", JSON.stringify({ user: data.user }));
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("refreshToken", data.refreshToken);
+                sessionStorage.setItem("auth", JSON.stringify({ user: data.user }));
+                sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("refreshToken", data.refreshToken);
                 setAuth({ user: data.user });
             }
         };
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("auth", JSON.stringify(auth));
+        sessionStorage.setItem("auth", JSON.stringify(auth));
     }, [auth]);
 
     return (

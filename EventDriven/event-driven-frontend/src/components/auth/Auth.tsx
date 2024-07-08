@@ -87,7 +87,13 @@ function Auth() {
             if (response.ok) {
                 const userData = await response.json();
                 dispatch(loginSuccess(userData.user));
-                setAuth({ user: userData.user });
+                setAuth({ user: {
+                    id: userData.user.id,
+                    firstName: userData.user.firstName,
+                    lastName: userData.user.lastName,
+                    email: userData.user.email,
+                    role: userData.user.role,
+                } });
                 navigate('/home');
             } else {
                 const errorData = await response.json();
