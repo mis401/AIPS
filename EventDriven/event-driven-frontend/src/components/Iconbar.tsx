@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 import Window from './Window';
 import { useNavigate } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
+import { io } from 'socket.io-client';
 
 function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -18,31 +19,24 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
     const settingsIconRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const socket = new WebSocket('ws://localhost:8000'); //ovo cudo odbija saradnju
+        const socket = io('http://localhost:8000'); 
 
-        socket.onopen = () => {
-            console.log('WebSocket connection established');
-        };
+        socket.on('connect', () => {
+            console.log('Socket.io connection established');
+        });
 
-        socket.onmessage = (event) => {
-            const newNotification = JSON.parse(event.data);
-            setNotifications((prev) => [...prev, newNotification]);
+        socket.on('notification', (notification) => {
+            setNotifications((prev) => [...prev, notification]);
             setNotificationCount((prev) => prev + 1);
-        };
+        });
 
-        socket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
+        socket.on('disconnect', () => {
+            console.log('Socket.io connection closed');
+        });
 
-        socket.onclose = () => {
-            console.log('WebSocket connection closed');
+        return () => {
+            socket.disconnect();
         };
-
-        return ()  => {
-            if (socket.readyState === 1) { // nije pomoglo
-                socket.close();
-            }
-        }
     }, []);
 
     const openSettingsWindow = () => {

@@ -1,39 +1,33 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',  
-    methods: ['GET', 'POST'], 
-    allowedHeaders: ['content-type'],
+    origin: 'http://localhost:3000', 
     credentials: true,
-  },
-})
+  }
+}
+)
 export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  private logger: Logger = new Logger('NotificationsGateway');
-
   @WebSocketServer() server: Server;
 
   afterInit(server: Server) {
-    this.logger.log('Init');
+    console.log('WebSocket server initialized');
   }
 
-  handleConnection(client: any, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
+  handleConnection(client: Socket, ...args: any[]) {
+    console.log(`Client connected: ${client.id}`);
   }
 
-  handleDisconnect(client: any) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+  handleDisconnect(client: Socket) {
+    console.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any) {
-    this.logger.log('Message received: ' + payload);
-  }
+
 
   sendNotification(notification: any) {
     this.server.emit('notification', notification);
-    this.logger.log('Notification sent: ' + JSON.stringify(notification));
+    console.log('Notification sent: ' + JSON.stringify(notification));
   }
 }

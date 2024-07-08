@@ -5,15 +5,13 @@ import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class NotificationsListenerService {
-  private readonly logger = new Logger(NotificationsListenerService.name);
-
   constructor(
     @Inject('NOTIFICATIONS_SERVICE') private readonly client: ClientProxy,  
   ) {}
 
   @OnEvent('community.join')
   async handleJoinCommunityEvent(event: JoinCommunityEvent) {
-    this.logger.log(`User ${event.firstName} joined community ${event.communityName}`);
+    console.log(`User ${event.firstName} joined community ${event.communityName}`);
 
     this.client.emit('notification', {
       communityId: event.communityID,
