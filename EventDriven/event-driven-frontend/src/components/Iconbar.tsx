@@ -12,28 +12,28 @@ import { io } from 'socket.io-client';
 function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isNotificationWindowOpen, setIsNotificationWindowOpen] = useState(false);
-    const [notificationCount, setNotificationCount]= useState(0);
-    const [notifications, setNotifications]  = useState<any[]>(()=>{
+    const [notificationCount, setNotificationCount] = useState(0);
+    const [notifications, setNotifications] = useState<any[]>(() => {
         const savedNotifications = localStorage.getItem('notifications');
-        return savedNotifications ? JSON.parse(savedNotifications):[];
+        return savedNotifications ? JSON.parse(savedNotifications) : [];
     });
     const navigate = useNavigate();
     const { logout } = useAuth();
     const settingsIconRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const socket = io('http://localhost:8000'); 
+        const socket = io('http://localhost:8000');
 
         socket.on('connect', () => {
             console.log('Socket.io connection established');
         });
 
         socket.on('notification', (notification) => {
-            console.log('Received notification:', notification); 
+            console.log('Received notification:', notification);
             setNotifications((prev) => {
                 const updatedNotifications = [...prev, notification];
-                console.log('Updated notifications:', updatedNotifications); 
-                
+                console.log('Updated notifications:', updatedNotifications);
+
                 localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
                 return updatedNotifications;
             });
@@ -88,13 +88,13 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
         if (settingsIconRef.current) {
             const rect = settingsIconRef.current.getBoundingClientRect();
             const top = rect.bottom;
-            
+
             return top;
         }
         return 0;
     }
 
-    return ( 
+    return (
         <div className="icons-bar">
             <Badge badgeContent={notificationCount} color="error">
                 <NotificationsIcon

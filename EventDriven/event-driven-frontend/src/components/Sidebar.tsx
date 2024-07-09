@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import CommunityDialog from './CommunityDialog';
 import useAuth from '../hooks/useAuth';
 
 interface SidebarProps {
-  onCommunitySelect: (communityName: string) => void;
+  onCommunitySelect: (communityName: string, communityId: number) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
@@ -15,11 +14,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
   const [communities, setCommunities] = useState<any[]>([]);
   const [isCommunityWindowOpen, setIsCommunityWindowOpen] = useState(false);
 
-  //zamena za redux, za sada privremena
-  // const userInState = useSelector((state: any) => state.auth.user);
   const { auth } = useAuth();
   const userInState = auth?.user;
-
 
   useEffect(() => {
     if (userInState !== null) {
@@ -92,11 +88,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
     else{
       handleDialogToggle();
     }
-
   }
 
-  const handleCommunityClick = (communityName: string) => {
-    onCommunitySelect(communityName);
+  const handleCommunityClick = (communityName: string, communityId: number) => {
+    onCommunitySelect(communityName, Number(communityId)); // Ensure communityId is a number
   }
 
   return (
@@ -111,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
       <div className='scrollable-communities'>
         <div className="communities-section">
           {communities.map((community) => (
-            <div key={community.id} className="community" onClick={() => handleCommunityClick(community.name)}>
+            <div key={community.id} className="community" onClick={() => handleCommunityClick(community.name, community.id)}>
               <span>{community.name}</span>
             </div>
           ))}
@@ -120,21 +115,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
       <div className={`add-community ${isCommunityWindowOpen ? 'inactive' : 'active'}`}>
         <button onClick={handleDialogToggle}>+</button> 
       </div>
-
-      {/* <div className={`${isCommunityWindowOpen ? 'active' : 'inactive'}`}> */}
-        <CommunityDialog
-          open={openDialog}
-          onClose={handleDialogToggle}  
-          selectedOption={selectedOption}
-          onCreateButtonClick={handleCreateButtonClick}
-          title="Add a new community"
-          options={['Join a community', 'Create a community']}
-          buttonText='Done'
-          onNewCommunityNameChange={(name) => setNewCommunityName(name)}
-          onCommunityCodeChange={(code) => setCommunityCode(code)}
-          onOptionChange={handleOptionChange}  
-        />  
-      {/* </div> */}
+      <CommunityDialog
+        open={openDialog}
+        onClose={handleDialogToggle}  
+        selectedOption={selectedOption}
+        onCreateButtonClick={handleCreateButtonClick}
+        title="Add a new community"
+        options={['Join a community', 'Create a community']}
+        buttonText='Done'
+        onNewCommunityNameChange={(name) => setNewCommunityName(name)}
+        onCommunityCodeChange={(code) => setCommunityCode(code)}
+        onOptionChange={handleOptionChange}  
+      />  
     </aside>
   );
 };
