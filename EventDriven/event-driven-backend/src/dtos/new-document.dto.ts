@@ -6,4 +6,5 @@ export interface NewDocumentDTO {
     createdBy: number;
     communityId: number;
     type: DocumentType;
+    content: string;
 }

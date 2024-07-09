@@ -32,7 +32,6 @@ export class DocController {
     
     @Post('create')
     async createDocument(@Body() document: NewDocumentDTO){
-        console.log(document);
         return await this.DocService.createDocument(document);
     }
 

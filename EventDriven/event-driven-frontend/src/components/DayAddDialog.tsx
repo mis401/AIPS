@@ -4,12 +4,15 @@ import React, { useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import { DocumentType } from '../dtos/NewDocument';
 
 interface DayAddDialogProps {
   open: boolean;
   onClose: (value: string | null) => void;
   onCreateButtonClick: (documentName: string) => void;
   title: string;
+  content?: string; // Add content prop
+  type?: DocumentType;
 }
 
 const DayAddDialog: React.FC<DayAddDialogProps> = ({ open, onClose, onCreateButtonClick, title }) => {
@@ -29,7 +32,10 @@ const DayAddDialog: React.FC<DayAddDialogProps> = ({ open, onClose, onCreateButt
   return (
     <Dialog open={open} onClose={handleClose}>
       <div style={{ padding: '20px' }}>
-        <h2>{title}</h2>
+        <div className='dialog-header'>
+          <h2>{title}</h2>
+          <Button onClick={handleClose}>x</Button>
+        </div>
         <TextField
           label="Document Name"
           variant="outlined"

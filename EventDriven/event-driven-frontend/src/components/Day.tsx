@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { DayObject } from './Calendar';
 import '../styles/Day.css';
-// import SimpleDialog, { SimpleDialogProps } from './SimpleDialog';
 import DocumentEditorDialog from './DocumentEditorDialog';
 import useAuth from '../hooks/useAuth';
 import DayAddDialog from './DayAddDialog';
@@ -15,37 +14,69 @@ interface DayProps {
   communityId: number;
 }
 
-const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick }) => {
-  // const [openDialog, setOpenDialog] = useState(false);
-  // const [selectedOption, setSelectedOption] = useState<string | null>(null);
+const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, communityId }) => {
   const [openEditor, setOpenEditor] = useState(false);
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [currentDocument, setCurrentDocument] = useState<{ content: string, type: DocumentType } | null>(null);
+  
   const { auth } = useAuth();
   const userInState = auth?.user;
-
-  const[openAddDialog, setOpenAddDialog] = useState(false);
 
   const handleClick = () => {
     onDateClick(day);
   };
   
-    const handleSaveDocument = async (content: string, type: DocumentType) => {
-      setOpenAddDialog(true);
+  const handleSaveDocument = async (content: string, type: DocumentType) => {
+    setOpenAddDialog(true);
+    setCurrentDocument({ content, type });
+  };
 
-      
-    };
-
-    const setDocumentName = (documentName: string) => {
-      console.log(documentName);
+  const handleCreateDocument = (documentName: string) => {
+    if (currentDocument) {
+      const formattedDate = new Date(day.year, day.month, day.day).toISOString();
+      const newDocument: NewDocumentDTO = {
+        name: documentName,
+        day: formattedDate,
+        createdBy: userInState?.id || 0,
+        communityId,
+        type: currentDocument.type,
+        content: currentDocument.content, // Include content
+      };
+  
+      saveDocument(newDocument);
+      setOpenAddDialog(false);
     }
+  };
+
+  const saveDocument = async (newDocument: NewDocumentDTO) => {
+    console.log(newDocument);
+
+    try {
+      const response = await fetch('http://localhost:8000/doc/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newDocument),
+      });
+      if (response.ok) {
+        console.log('Document saved successfully');
+      } else {
+        console.error('Failed to save the document');
+      }
+    } catch (error) {
+      console.error('Error saving the document:', error);
+    }
+  };
 
   return (
     <div
-      className={`day ${day.day === 0 ? 'empty' : ''} ${isSelected ? 'selected' : ''} ${isCurrentDay ? 'currentDay' : ''} `}
+      className={`day ${day.day === 0 ? 'empty' : ''} ${isSelected ? 'selected' : ''} ${isCurrentDay ? 'currentDay' : ''}`}
       onClick={handleClick}
     >
       <div className='dayEvents'>
         <label className={`dayLabel ${day.isCurrentMonth ? '' : 'faded'}`}>
-          {day.day !== 0 && day.day}        
+          {day.day !== 0 && day.day}
         </label>
       </div>
 
@@ -62,10 +93,9 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick })
       <DayAddDialog
         open={openAddDialog}
         onClose={() => setOpenAddDialog(false)}
-        onCreateButtonClick={setDocumentName}
+        onCreateButtonClick={handleCreateDocument}
         title="Create a new document"
       />
-
     </div>
   );
 };

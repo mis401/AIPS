@@ -4,6 +4,8 @@ import "../styles/Calendar.css";
 
 export interface DayObject {
   day: number;
+  month: number;
+  year: number;
   isCurrentMonth: boolean;
 }
 
@@ -12,7 +14,9 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
-  const MONTH_NAMES: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const MONTH_NAMES: string[] = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+  ];
   const DAYS: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const [month, setMonth] = useState<number>(0);
@@ -35,11 +39,15 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
     const weeks: DayObject[][] = [[]];
     let currentWeek = 0;
 
-    const prevMonthDays = getDaysInMonth(year, month - 1);
+    const prevMonthDays = month === 0 ? getDaysInMonth(year - 1, 11) : getDaysInMonth(year, month - 1);
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevYear = month === 0 ? year - 1 : year;
 
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
       weeks[currentWeek].push({
         day: prevMonthDays - i,
+        month: prevMonth,
+        year: prevYear,
         isCurrentMonth: false,
       });
     }
@@ -51,15 +59,22 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
       }
       weeks[currentWeek].push({
         day,
+        month,
+        year,
         isCurrentMonth: true,
       });
     }
+
+    const nextMonth = month === 11 ? 0 : month + 1;
+    const nextYear = month === 11 ? year + 1 : year;
 
     const lastWeek = weeks[weeks.length - 1];
     const remainingEmptyDays = 7 - lastWeek.length;
     for (let i = 0; i < remainingEmptyDays; i++) {
       weeks[currentWeek].push({
         day: i + 1,
+        month: nextMonth,
+        year: nextYear,
         isCurrentMonth: false,
       });
     }
@@ -67,10 +82,11 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
     while (weeks.length < 6) {
       currentWeek++;
       weeks[currentWeek] = [];
-
       for (let i = 0; i < 7; i++) {
         weeks[currentWeek].push({
           day: i + 1,
+          month: nextMonth,
+          year: nextYear,
           isCurrentMonth: false,
         });
       }
@@ -81,20 +97,23 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
 
   const handleDateClick = (day: DayObject) => {
     setSelectedDate(day);
-    console.log(`Selected date: ${year}-${month + 1}-${day.day}`);
+    console.log(day);
   };
 
   const handleMonthChange = (increment: number) => {
-    const newMonth = month + increment;
+    let newMonth = month + increment;
+    let newYear = year;
+
     if (newMonth < 0) {
-      setMonth(11);
-      setYear(year - 1);
+      newMonth = 11;
+      newYear = year - 1;
     } else if (newMonth > 11) {
-      setMonth(0);
-      setYear(year + 1);
-    } else {
-      setMonth(newMonth);
+      newMonth = 0;
+      newYear = year + 1;
     }
+
+    setMonth(newMonth);
+    setYear(newYear);
     setSelectedDate(null);
   };
 
@@ -124,7 +143,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
                 <Day
                   key={dayIndex}
                   day={day}
-                  isSelected={day === selectedDate}
+                  isSelected={(selectedDate && day.day === selectedDate.day && day.month === selectedDate.month && day.year === selectedDate.year) || false} 
                   isCurrentDay={day.isCurrentMonth && day.day === today.getDate() && month === today.getMonth() && year === today.getFullYear()}
                   onDateClick={handleDateClick}
                   communityId={1} //BICE IZMENJENO

@@ -1,107 +1,89 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Community, DocumentType } from '@prisma/client';
-import { Http2ServerResponse } from 'http2';
 import { PrismaService } from 'prisma/prisma.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FilesysService } from 'src/filesys/filesys.service';
 
-const fs = require('node:fs');
 @Injectable()
 export class DocService {
     constructor(private prisma: PrismaService, private filesys: FilesysService) {}
 
-
     async createDocument(newDoc: NewDocumentDTO) {
         try {
             const user = await this.prisma.user.findUniqueOrThrow({
-                where: {
-                    id: newDoc.createdBy
-                }
-            })
+                where: { id: newDoc.createdBy }
+            });
             const community = await this.prisma.community.findUniqueOrThrow({
-                where: {
-                    id: newDoc.communityId
-                }
-            })
+                where: { id: newDoc.communityId }
+            });
             const path: string = `/${community.name}/${newDoc.name}`;
             let documentPath = null;
+
             switch(newDoc.type) {
                 case DocumentType.DOCUMENT:
                     documentPath = await this.filesys.generateTextDocument(newDoc, user, community);
                     break;
-                    case DocumentType.WHITEBOARD:
-                        documentPath = await this.filesys.generateWhiteboardDocument(newDoc, user, community);
+                case DocumentType.WHITEBOARD:
+                    documentPath = await this.filesys.generateWhiteboardDocument(newDoc, user, community);
                     break;
                 case DocumentType.TODO:
                     documentPath = await this.filesys.generateTodoDocument(newDoc, user, community);
                     break;
             }
+
             if (documentPath === null) {
-                throw new Error('Document creation failed')
+                throw new Error('Document creation failed');
             }
+
             const doc = await this.prisma.document.create({
                 data: {
                     name: newDoc.name,
                     day: newDoc.day,
                     createdBy: {
-                        connect: {
-                            id: newDoc.createdBy
-                        }
+                        connect: { id: newDoc.createdBy }
                     },
-                    calendar: { //ILI CALENDARID??
-                        connect: {
-                            id: community.calendarId
-                        }
+                    calendar: { 
+                        connect: { id: community.calendarId }
                     },
                     type: newDoc.type,
                     path: documentPath
                 }
-            })
+            });
+
+            // Save the content to the file system
+            await this.filesys.saveDocumentContent(documentPath, newDoc.content);
+
             return doc;
         } catch (error) {
             throw new InternalServerErrorException(error.message);
         }
     }
 
-    // async updateDocument(id: number, content: any) {
-    //     // Assuming you update the document content here
-    //     const updatedDoc = await this.prisma.document.update({
-    //       where: { id },
-    //       data: { content },
-    //     });
-    //     return updatedDoc;
-    //   }
-
     async getDocumentInformation(id: number) {
         try {
             const doc = await this.prisma.document.findUnique({
-                where: {
-                    id: id
-                }
-            })
+                where: { id: id }
+            });
             if (!doc) {
-                throw new NotFoundException('Document not found')
+                throw new NotFoundException('Document not found');
             }
             return doc;
-        }
-        catch(e){
+        } catch (e) {
             console.log(e.message);
             throw e;
         }
     }
 
     async getDocumentContent(id: number) {
-        try{
+        try {
             const doc = await this.prisma.document.findUnique({
-                where: {
-                    id: id
-                }
-            })
+                where: { id: id }
+            });
             if (!doc) {
-                throw new NotFoundException('Document not found')
+                throw new NotFoundException('Document not found');
             }
             let content = null;
-            switch(doc.type){
+            switch(doc.type) {
                 case DocumentType.DOCUMENT:
                     content = await this.filesys.getTextDocument(doc.path);
                     break;
@@ -109,27 +91,24 @@ export class DocService {
                     content = await this.filesys.getTodoDocument(doc.path);
                     break;
                 case DocumentType.WHITEBOARD:
-                    content = await this.filesys.getWhiteboardDocument(doc.path);//vraca se blob
+                    content = await this.filesys.getWhiteboardDocument(doc.path);
                     break;
             }
             if (content === null) {
-                throw new InternalServerErrorException('Document content cannot be read')
+                throw new InternalServerErrorException('Document content cannot be read');
             }
             return content;
-        }
-        catch(e){
+        } catch (e) {
             console.log(e.message);
             throw e;
         }
     }
 
-    
-
     async getDocumentsForCalendarMonth(calendarId: number, month: number, year: number) {
         try {
-            console.log(calendarId, month, year)
-            const start = new Date(year, month-1, 1, 0, 0, 0);
-            const end = new Date(year, month-1, 31, 23, 59, 59);
+            console.log(calendarId, month, year);
+            const start = new Date(year, month - 1, 1, 0, 0, 0);
+            const end = new Date(year, month - 1, 31, 23, 59, 59);
             console.log(start);
             console.log(end);
             const docs = await this.prisma.document.findMany({
@@ -156,10 +135,9 @@ export class DocService {
                     },
                     calendarId: true
                 }
-            })
+            });
             return docs;
-        }
-        catch(e){
+        } catch (e) {
             console.log(e.message);
             throw e;
         }

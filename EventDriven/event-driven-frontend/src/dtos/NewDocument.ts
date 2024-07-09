@@ -4,10 +4,11 @@ export interface NewDocumentDTO {
     createdBy: number;
     communityId: number;
     type: DocumentType;
+    content: string;
 }
 
 export enum DocumentType {
-    WHITEBOARD,
-    DOCUMENT,
-    TODO
+    WHITEBOARD = 'WHITEBOARD',
+    DOCUMENT = 'DOCUMENT',
+    TODO = 'TODO'
   }

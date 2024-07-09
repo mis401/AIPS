@@ -5,9 +5,6 @@ const RequireAuth = ({ allowedRoles }: { allowedRoles: string[] }) => {
     const { auth } = useAuth();
     const location = useLocation();
 
-    console.log("RequireAuth - Auth user:", auth?.user);
-    console.log("RequireAuth - Allowed roles:", allowedRoles);
-
     if (!auth?.user) {
         return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
     }
