@@ -15,8 +15,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NotificationsGateway } from './notification/notification.gateway';
 import { DocService } from './doc/doc.service';
 import { CollaborationGateway } from './socket/collaboration.gateway';
+import { ChatListenerService } from './chat-mq/chat.listener.service';
+import { ChatGateway } from './chat-mq/chat.gateway';
+import { MessageService } from './message/message.service';
+import { MessageModule } from './message/message.module';
 
 @Module({
+
   controllers: [AppController],
 
   providers: [
@@ -26,7 +31,10 @@ import { CollaborationGateway } from './socket/collaboration.gateway';
     NotificationsListenerService,
     NotificationsGateway,
     DocService,
-    CollaborationGateway
+    CollaborationGateway,
+    ChatListenerService,
+    ChatGateway,
+    MessageService,
   ],
 
   imports: [
@@ -36,6 +44,7 @@ import { CollaborationGateway } from './socket/collaboration.gateway';
     DocModule, 
     EventsModule, 
     UserModule,
+    MessageModule,
     EventEmitterModule.forRoot(),
     ClientsModule.register([
       {
@@ -49,6 +58,17 @@ import { CollaborationGateway } from './socket/collaboration.gateway';
           },
         },
       },
+      {
+        name:"MESSAGES_SERVICE",
+        transport:Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'messages_queue',
+          queueOptions: {
+            durable: true,
+          }
+        }
+      }
     ]),
   ],
 })

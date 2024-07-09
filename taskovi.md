@@ -21,7 +21,10 @@
 - ~~povezivanje auth~~
 - ~~autorizovane rute~~
 - ~~routing~~
-- react redux
+- react redux ->treba da se proveri
+- ~~rabbitmq i povezivanje sa soketima~~
+- notifikacije -> istorija, deljenje po zajednicama 
+- chat -> aktivni korisnici u okviru zajednice, grupni cet 
 
 
 

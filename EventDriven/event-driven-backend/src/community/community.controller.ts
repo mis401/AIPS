@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { CommunityService } from './community.service';
 
 @Controller('community')
@@ -10,6 +10,11 @@ export class CommunityController {
         const res = await this.communityService.getUserCommunities(parseInt(userId));
         console.log(res);
         return res;
+    }
+
+    @Get(':id/members')
+    async getCommunityMembers(@Param('id') id: string) {
+        return await this.communityService.getCommunityMembers(parseInt(id));
     }
 
     @Get('get-community')

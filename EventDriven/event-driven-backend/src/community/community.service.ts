@@ -151,6 +151,14 @@ export class CommunityService {
         }
     }
 
+    async getCommunityMembers(id: number) {
+      const community = await this.getCommunity(id);
+      if (!community) {
+        throw new NotFoundException('Community not found');
+      }
+      return community.members;
+    }
+
     async joinCommunity(userId: number, communityCode: string) {
         console.log('joinCommunity called with:', { userId, communityCode });
     
