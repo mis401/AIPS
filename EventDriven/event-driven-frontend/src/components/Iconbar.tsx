@@ -12,8 +12,11 @@ import { io } from 'socket.io-client';
 function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isNotificationWindowOpen, setIsNotificationWindowOpen] = useState(false);
-    const [notifications, setNotifications] = useState<any[]>([]);
-    const [notificationCount, setNotificationCount] = useState(0);
+    const [notificationCount, setNotificationCount]= useState(0);
+    const [notifications, setNotifications]  = useState<any[]>(()=>{
+        const savedNotifications = localStorage.getItem('notifications');
+        return savedNotifications ? JSON.parse(savedNotifications):[];
+    });
     const navigate = useNavigate();
     const { logout } = useAuth();
     const settingsIconRef = useRef<HTMLDivElement>(null);
@@ -26,7 +29,14 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
         });
 
         socket.on('notification', (notification) => {
-            setNotifications((prev) => [...prev, notification]);
+            console.log('Received notification:', notification); 
+            setNotifications((prev) => {
+                const updatedNotifications = [...prev, notification];
+                console.log('Updated notifications:', updatedNotifications); 
+                
+                localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+                return updatedNotifications;
+            });
             setNotificationCount((prev) => prev + 1);
         });
 
@@ -84,7 +94,7 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
         return 0;
     }
 
-    return ( //kris izvini
+    return ( 
         <div className="icons-bar">
             <Badge badgeContent={notificationCount} color="error">
                 <NotificationsIcon
