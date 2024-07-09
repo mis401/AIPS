@@ -127,6 +127,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
                   isSelected={day === selectedDate}
                   isCurrentDay={day.isCurrentMonth && day.day === today.getDate() && month === today.getMonth() && year === today.getFullYear()}
                   onDateClick={handleDateClick}
+                  communityId={1} //BICE IZMENJENO
                 />
               ))}
             </div>

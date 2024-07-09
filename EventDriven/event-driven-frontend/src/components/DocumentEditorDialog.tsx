@@ -5,16 +5,17 @@ import textFileIcon from '../assets/images/text-file.png';
 import todoListIcon from '../assets/images/todo-list.png';
 import whiteboardIcon from '../assets/images/whiteboard.png';
 import undoIcon from '../assets/images/undo.png'; // Import the undo button image
+import { DocumentType } from '../dtos/NewDocument';
 
 interface DocumentEditorDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (content: string, type: string) => void;
+  onSave: (content: string, type: DocumentType) => void;
 }
 
 const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClose, onSave }) => {
   const [content, setContent] = useState('');
-  const [docType, setDocType] = useState('Text File');
+  const [docType, setDocType] = useState<DocumentType>(DocumentType.DOCUMENT);
   const [todoItems, setTodoItems] = useState<string[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#000000');
@@ -42,7 +43,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   }, [docType]);
 
   const handleSave = () => {
-    const formattedContent = docType === 'To-Do List' ? todoItems.join('\n') : content;
+    const formattedContent = docType === DocumentType.TODO ? todoItems.join('\n') : content;
     onSave(formattedContent, docType);
     onClose();
   };
@@ -70,10 +71,10 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
     setTodoItems(newTodoItems);
   };
 
-  const handleDocTypeChange = (type: string) => {
-    if (docType === 'To-Do List' && type !== 'To-Do List') {
+  const handleDocTypeChange = (type: DocumentType) => {
+    if (docType === DocumentType.TODO && type !== DocumentType.TODO) {
       setContent(todoItems.join('\n'));
-    } else if (type === 'To-Do List') {
+    } else if (type === DocumentType.TODO) {
       setTodoItems(content.split('\n'));
     }
     setDocType(type);
@@ -155,36 +156,36 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
       <div className="dialog-content">
         <div className="dialog-header">
           <button
-            onClick={() => handleDocTypeChange('Text File')}
-            className={docType === 'Text File' ? 'selected' : ''}
+            onClick={() => handleDocTypeChange(DocumentType.DOCUMENT)}
+            className={docType === DocumentType.DOCUMENT ? 'selected' : ''}
             title="Text File"
           >
             <img src={textFileIcon} alt="Text File" />
           </button>
           <button
-            onClick={() => handleDocTypeChange('To-Do List')}
-            className={docType === 'To-Do List' ? 'selected' : ''}
+            onClick={() => handleDocTypeChange(DocumentType.TODO)}
+            className={docType === DocumentType.TODO ? 'selected' : ''}
             title="To-Do List"
           >
             <img src={todoListIcon} alt="To-Do List" />
           </button>
           <button
-            onClick={() => handleDocTypeChange('Whiteboard')}
-            className={docType === 'Whiteboard' ? 'selected' : ''}
+            onClick={() => handleDocTypeChange(DocumentType.WHITEBOARD)}
+            className={docType === DocumentType.WHITEBOARD ? 'selected' : ''}
             title="Whiteboard"
           >
             <img src={whiteboardIcon} alt="Whiteboard" />
           </button>
         </div>
         <div className="dialog-body">
-          {docType === 'Text File' && (
+          {docType === DocumentType.DOCUMENT && (
             <textarea
               value={content}
               onChange={handleContentChange}
               placeholder="Type your text here..."
             />
           )}
-          {docType === 'To-Do List' && (
+          {docType === DocumentType.TODO && (
             <div className="todo-list">
               {todoItems.map((item, index) => (
                 <div key={index} className="todo-item">
@@ -203,7 +204,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
               ))}
             </div>
           )}
-          {docType === 'Whiteboard' && (
+          {docType === DocumentType.WHITEBOARD && (
             <div className="whiteboard-container">
               <canvas
                 ref={canvasRef}

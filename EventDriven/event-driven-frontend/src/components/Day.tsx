@@ -3,41 +3,40 @@ import { DayObject } from './Calendar';
 import '../styles/Day.css';
 // import SimpleDialog, { SimpleDialogProps } from './SimpleDialog';
 import DocumentEditorDialog from './DocumentEditorDialog';
+import useAuth from '../hooks/useAuth';
+import DayAddDialog from './DayAddDialog';
+import { DocumentType, NewDocumentDTO } from '../dtos/NewDocument';
 
 interface DayProps {
   day: DayObject;
   isSelected: boolean;
   isCurrentDay: boolean;
   onDateClick: (day: DayObject) => void;
+  communityId: number;
 }
 
 const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick }) => {
   // const [openDialog, setOpenDialog] = useState(false);
   // const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [openEditor, setOpenEditor] = useState(false);
+  const { auth } = useAuth();
+  const userInState = auth?.user;
 
+  const[openAddDialog, setOpenAddDialog] = useState(false);
 
   const handleClick = () => {
     onDateClick(day);
   };
   
-    const handleSaveDocument = (content: string, type: string) => {
-      console.log('Document saved:', { content, type });
-     };
+    const handleSaveDocument = async (content: string, type: DocumentType) => {
+      setOpenAddDialog(true);
 
-  // const addDocumentClick = () => {
-  //   setOpenDialog(true);
-  // };
+      
+    };
 
-  // const handleDialogClose: SimpleDialogProps['onClose'] = (value) => {
-  //   setSelectedOption(value);
-  //   setOpenDialog(false);
-  // };
-
-  // const handleCreateButtonClick = () => {
-  //   setOpenDialog(false);
-  //   console.log(selectedOption);
-  // };
+    const setDocumentName = (documentName: string) => {
+      console.log(documentName);
+    }
 
   return (
     <div
@@ -60,16 +59,13 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick })
         onSave={handleSaveDocument}
       />
 
-      {/* <SimpleDialog
-        selectedValue=""
-        open={openDialog}
-        onClose={handleDialogClose}
-        selectedOption={selectedOption}
-        onCreateButtonClick={handleCreateButtonClick}
+      <DayAddDialog
+        open={openAddDialog}
+        onClose={() => setOpenAddDialog(false)}
+        onCreateButtonClick={setDocumentName}
         title="Create a new document"
-        options={['Text Document', 'To-do List', 'Whiteboard']}
-        buttonText='Create'
-      /> */}
+      />
+
     </div>
   );
 };

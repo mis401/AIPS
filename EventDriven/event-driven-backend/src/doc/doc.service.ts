@@ -48,7 +48,7 @@ export class DocService {
                             id: newDoc.createdBy
                         }
                     },
-                    calendar: {
+                    calendar: { //ILI CALENDARID??
                         connect: {
                             id: community.calendarId
                         }
