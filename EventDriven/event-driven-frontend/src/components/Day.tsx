@@ -12,9 +12,10 @@ interface DayProps {
   isCurrentDay: boolean;
   onDateClick: (day: DayObject) => void;
   communityId: number;
+  onDocumentClick: (documentId: number) => void;
 }
 
-const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, communityId }) => {
+const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, communityId, onDocumentClick }) => {
   const [openEditor, setOpenEditor] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [currentDocument, setCurrentDocument] = useState<{ content: string, type: DocumentType } | null>(null);
@@ -33,7 +34,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
 
   const handleCreateDocument = (documentName: string) => {
     if (currentDocument) {
-      const formattedDate = new Date(day.year, day.month, day.day+1).toISOString();
+      const formattedDate = new Date(day.year, day.month, day.day + 1).toISOString();
       const newDocument: NewDocumentDTO = {
         name: documentName,
         day: formattedDate,
@@ -78,6 +79,13 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         <label className={`dayLabel ${day.isCurrentMonth ? '' : 'faded'}`}>
           {day.day !== 0 && day.day}
         </label>
+        <div className="documents">
+          {day.documents?.map((doc) => (
+            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => onDocumentClick(doc.id)}>
+              {doc.name}
+            </div>
+          ))}
+        </div>
       </div>
 
       <button className={`addEvent ${day.isCurrentMonth ? '' : 'faded'}`} onClick={() => setOpenEditor(true)}>

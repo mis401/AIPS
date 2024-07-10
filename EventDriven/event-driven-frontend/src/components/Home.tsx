@@ -33,7 +33,10 @@ function Home() {
         <div className="container">
            <Sidebar onCommunitySelect={handleCommunitySelect}
                 onDefaultCommunitySet={handleDefaultCommunitySet}/>
-           <Calendar communityName={selectedCommunity}/>
+           {selectedCommunityId !== null && (
+               <Calendar communityName={selectedCommunity}
+               communityId={selectedCommunityId}/>
+           )}
            <IconsBar toggleChatSidebar={toggleChatSidebar}/>   
            {selectedCommunityId !== null && (
                <ChatSidebar 

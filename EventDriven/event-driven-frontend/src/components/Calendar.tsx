@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import Day from "./Day";
 import "../styles/Calendar.css";
+import { DocumentType, NewDocumentDTO } from '../dtos/NewDocument';
+import DocumentEditorDialog from "./DocumentEditorDialog";
 
 export interface DayObject {
   day: number;
   month: number;
   year: number;
   isCurrentMonth: boolean;
+  documents?: { id: number; name: string; type: DocumentType }[];
 }
 
 interface CalendarProps {
   communityName: string | null;
+  communityId: number;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
+const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
   const MONTH_NAMES: string[] = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
   ];
@@ -22,6 +26,9 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
   const [month, setMonth] = useState<number>(0);
   const [year, setYear] = useState<number>(0);
   const [selectedDate, setSelectedDate] = useState<DayObject | null>(null);
+  const [documents, setDocuments] = useState<{ [key: string]: { id: number; name: string; type: DocumentType }[] }>({});
+  const [openEditor, setOpenEditor] = useState<boolean>(false);
+  const [currentDocument, setCurrentDocument] = useState<{ content: string, type: DocumentType } | null>(null);
 
   const today = new Date();
 
@@ -30,6 +37,33 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
     setMonth(today.getMonth());
     setYear(today.getFullYear());
   }, []);
+
+  useEffect(() => {
+    fetchDocumentsForMonth(communityId, month + 1, year);
+  }, [month, year, communityId]);
+
+  const fetchDocumentsForMonth = async (communityId: number, month: number, year: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/doc/get-docs-calendar-month?calendarId=${communityId}&month=${month}&year=${year}`);
+      if (response.ok) {
+        const docs = await response.json();
+        const docsByDay: { [key: string]: { id: number; name: string; type: DocumentType }[] } = {};
+        docs.forEach((doc: { id: number; name: string; day: string; type: DocumentType }) => {
+          const day = new Date(doc.day).getDate();
+          const key = `${year}-${month}-${day}`;
+          if (!docsByDay[key]) {
+            docsByDay[key] = [];
+          }
+          docsByDay[key].push({ id: doc.id, name: doc.name, type: doc.type });
+        });
+        setDocuments(docsByDay);
+      } else {
+        console.error('Failed to fetch documents');
+      }
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    }
+  };
 
   const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
 
@@ -57,11 +91,13 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
         currentWeek++;
         weeks[currentWeek] = [];
       }
+      const key = `${year}-${month + 1}-${day}`;
       weeks[currentWeek].push({
         day,
         month,
         year,
         isCurrentMonth: true,
+        documents: documents[key] || [],
       });
     }
 
@@ -117,6 +153,21 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
     setSelectedDate(null);
   };
 
+  const handleDocumentClick = async (documentId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/doc/get?id=${documentId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentDocument({ content: data.content, type: data.information.type });
+        setOpenEditor(true);
+      } else {
+        console.error('Failed to fetch document content');
+      }
+    } catch (error) {
+      console.error('Error fetching document content:', error);
+    }
+  };
+
   return (
     <div className="home-container">
       <div className="calendar">
@@ -143,16 +194,27 @@ const Calendar: React.FC<CalendarProps> = ({ communityName }) => {
                 <Day
                   key={dayIndex}
                   day={day}
-                  isSelected={(selectedDate && day.day === selectedDate.day && day.month === selectedDate.month && day.year === selectedDate.year) || false} 
+                  isSelected={(selectedDate && day.day === selectedDate.day && day.month === selectedDate.month && day.year === selectedDate.year) || false}
                   isCurrentDay={day.isCurrentMonth && day.day === today.getDate() && month === today.getMonth() && year === today.getFullYear()}
                   onDateClick={handleDateClick}
-                  communityId={1} //BICE IZMENJENO
+                  communityId={communityId}
+                  onDocumentClick={handleDocumentClick} // Pass the handler to Day component
                 />
               ))}
             </div>
           ))}
         </div>
       </div>
+
+      {currentDocument && (
+        <DocumentEditorDialog
+          open={openEditor}
+          onClose={() => setOpenEditor(false)}
+          onSave={() => {}}
+          content={currentDocument.content}
+          type={currentDocument.type}
+        />
+      )}
     </div>
   );
 };

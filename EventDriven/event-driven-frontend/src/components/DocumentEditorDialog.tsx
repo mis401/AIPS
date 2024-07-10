@@ -11,11 +11,13 @@ interface DocumentEditorDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: (content: string, type: DocumentType) => void;
+  content?: string;
+  type?: DocumentType;
 }
 
-const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClose, onSave }) => {
-  const [content, setContent] = useState('');
-  const [docType, setDocType] = useState<DocumentType>(DocumentType.DOCUMENT);
+const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClose, onSave, content = '', type = DocumentType.DOCUMENT }) => {
+  const [currentContent, setCurrentContent] = useState(content);
+  const [docType, setDocType] = useState<DocumentType>(type);
   const [todoItems, setTodoItems] = useState<string[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#000000');
@@ -25,12 +27,14 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   const historyRef = useRef<ImageData[]>([]);
 
   useEffect(() => {
-    if (!open) {
-      setContent('');
+    setCurrentContent(content);
+    setDocType(type);
+    if (type === DocumentType.TODO) {
+      setTodoItems(content.split('\n'));
+    } else {
       setTodoItems([]);
-      historyRef.current = [];
     }
-  }, [open]);
+  }, [open, content, type]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,31 +47,13 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   }, [docType]);
 
   const handleSave = () => {
-    let formattedContent = content;
-    if (docType === DocumentType.TODO) {
-      formattedContent = todoItems.join('\n');
-    } else if (docType === DocumentType.WHITEBOARD) {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const offScreenCanvas = document.createElement('canvas');
-        offScreenCanvas.width = canvas.width;
-        offScreenCanvas.height = canvas.height;
-        const offScreenCtx = offScreenCanvas.getContext('2d');
-
-        if (offScreenCtx) {
-          offScreenCtx.fillStyle = 'white';
-          offScreenCtx.fillRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
-          offScreenCtx.drawImage(canvas, 0, 0);
-          formattedContent = offScreenCanvas.toDataURL('image/png');
-        }
-      }
-    }
+    const formattedContent = docType === DocumentType.TODO ? todoItems.join('\n') : currentContent;
     onSave(formattedContent, docType);
     onClose();
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+    setCurrentContent(e.target.value);
   };
 
   const handleTodoContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -91,9 +77,9 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
 
   const handleDocTypeChange = (type: DocumentType) => {
     if (docType === DocumentType.TODO && type !== DocumentType.TODO) {
-      setContent(todoItems.join('\n'));
+      setCurrentContent(todoItems.join('\n'));
     } else if (type === DocumentType.TODO) {
-      setTodoItems(content.split('\n'));
+      setTodoItems(currentContent.split('\n'));
     }
     setDocType(type);
   };
@@ -197,7 +183,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
         <div className="dialog-body">
           {docType === DocumentType.DOCUMENT && (
             <textarea
-              value={content}
+              value={currentContent}
               onChange={handleContentChange}
               placeholder="Type your text here..."
             />
