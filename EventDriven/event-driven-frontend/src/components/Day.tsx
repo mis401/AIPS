@@ -12,7 +12,7 @@ interface DayProps {
   isCurrentDay: boolean;
   onDateClick: (day: DayObject) => void;
   communityId: number;
-  onDocumentClick: (documentId: number) => void;
+  onDocumentClick: (documentId: number, documentName: string) => void;
 }
 
 const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, communityId, onDocumentClick }) => {
@@ -70,6 +70,27 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
     }
   };
 
+  const updateCurrentDocumentStatus = async (documentName: string | null) => {
+    console.log(`Updating current document status to: ${documentName}`);
+    try {
+      const response = await fetch(`http://localhost:8000/user/currentDocument?id=${userInState?.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ document: documentName }),
+      });
+
+      if (response.ok) {
+        console.log('Document status updated successfully');
+      } else {
+        console.error('Failed to update document status');
+      }
+    } catch (error) {
+      console.error('Error updating document status:', error);
+    }
+  };
+
   return (
     <div
       className={`day ${day.day === 0 ? 'empty' : ''} ${isSelected ? 'selected' : ''} ${isCurrentDay ? 'currentDay' : ''}`}
@@ -81,7 +102,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         </label>
         <div className="documents">
           {day.documents?.map((doc) => (
-            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => onDocumentClick(doc.id)}>
+            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id, doc.name); updateCurrentDocumentStatus(doc.name); }}>
               {doc.name}
             </div>
           ))}
@@ -94,7 +115,10 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
 
       <DocumentEditorDialog
         open={openEditor}
-        onClose={() => setOpenEditor(false)}
+        onClose={() => {
+          setOpenEditor(false);
+          updateCurrentDocumentStatus(null);
+        }}
         onSave={handleSaveDocument}
       />
 

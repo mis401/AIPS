@@ -24,6 +24,7 @@ model User {
   communities         Community[] @relation("memberOf")
   subscribedTo        Document[]  @relation("subscriptions")
   status              String      @default("offline") 
+  currentDocument     String?
 }
 
 model Community {
