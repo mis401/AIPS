@@ -13,9 +13,7 @@ function Home() {
     const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>(null);
 
     const toggleChatSidebar = () => {
-        console.log("toggleChatSidebar called");
         setIsChatSidebarOpen(!isChatSidebarOpen);
-        console.log("isChatSidebarOpen:", !isChatSidebarOpen);
     }
 
     const handleDefaultCommunitySet = (defaultCommunityName: string, defaultCommunityId: number) => {
@@ -26,18 +24,17 @@ function Home() {
     const handleCommunitySelect = (communityName: string, communityId: number) => {
         setSelectedCommunity(communityName);
         setSelectedCommunityId(Number(communityId));
-        console.log("CommunityID:", communityId);
     }
 
     return (
-        <div className="container">
+        <div className={`container ${isChatSidebarOpen ? 'chat-sidebar-open' : ''}`}>
            <Sidebar onCommunitySelect={handleCommunitySelect}
                 onDefaultCommunitySet={handleDefaultCommunitySet}/>
            {selectedCommunityId !== null && (
                <Calendar communityName={selectedCommunity}
                communityId={selectedCommunityId}/>
            )}
-           <IconsBar toggleChatSidebar={toggleChatSidebar}/>   
+           <IconsBar toggleChatSidebar={toggleChatSidebar} isChatSidebarOpen={isChatSidebarOpen}/>   
            {selectedCommunityId !== null && (
                <ChatSidebar 
                    isChatSidebarOpen={isChatSidebarOpen} 

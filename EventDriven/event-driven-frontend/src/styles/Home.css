@@ -3,4 +3,9 @@
     align-items: stretch;
     height: 100vh;
     width: 100vw;
+    transition: all 0.3s;
+}
+
+.container.chat-sidebar-open .icons-bar {
+    margin-left: 250px; 
 }

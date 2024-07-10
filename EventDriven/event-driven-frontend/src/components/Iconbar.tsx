@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
 import { io } from 'socket.io-client';
 
-function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
+function IconsBar({ toggleChatSidebar, isChatSidebarOpen }: { toggleChatSidebar: () => void, isChatSidebarOpen: boolean }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isNotificationWindowOpen, setIsNotificationWindowOpen] = useState(false);
     const [notificationCount, setNotificationCount] = useState(0);
@@ -108,7 +108,7 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
     }
 
     return (
-        <div className="icons-bar">
+        <div className={`icons-bar ${isChatSidebarOpen ? 'shifted' : ''}`}>
             <Badge badgeContent={notificationCount} color="error">
                 <NotificationsIcon
                     className='icon'

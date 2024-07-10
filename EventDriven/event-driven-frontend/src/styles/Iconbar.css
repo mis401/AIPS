@@ -7,6 +7,11 @@
     position: relative; 
     padding-left: 20px;
     padding-right: 20px;
+    transition: margin-left 0.3s; 
+}
+
+.icons-bar.shifted {
+    margin-left: 250px; 
 }
 
 .icon {
@@ -25,10 +30,11 @@
     border-radius: 50%;
 }
 
-.msg:hover{
+.msg:hover {
     background-color: #4299e1;
 }
 
 .logout:hover {
     cursor: pointer;
 }
+
