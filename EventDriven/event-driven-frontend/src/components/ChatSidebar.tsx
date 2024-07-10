@@ -10,6 +10,10 @@ interface Member {
     email: string;
 }
 
+interface MemberWithStatus extends Member {
+    status: 'online' | 'offline';
+}
+
 interface Message {
     senderId: number;
     communityId: number;
@@ -17,9 +21,9 @@ interface Message {
     senderName: string;
 }
 
-const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boolean, communityId: number}) => {
+const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: boolean, communityId: number }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [members, setMembers] = useState<Member[]>([]);
+    const [members, setMembers] = useState<MemberWithStatus[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const socket = useRef<any>(null);
@@ -39,13 +43,16 @@ const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boole
                     method: 'GET',
                     credentials: 'include',
                 });
-    
+
                 if (response.ok) {
                     const data = await response.json();
-                    setMembers(data);
+                    setMembers(data.map((member: Member) => ({
+                        ...member,
+                        status: 'offline', // default status
+                    })));
                 } else {
                     const errorData = await response.json();
-                    console.error('Signout failed: ', errorData.message);
+                    console.error('Fetch members failed: ', errorData.message);
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
@@ -59,13 +66,16 @@ const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boole
                     method: 'GET',
                     credentials: 'include',
                 });
-    
+
                 if (response.ok) {
                     const data = await response.json();
                     setMessages(data.map((msg: any) => ({
                         ...msg,
-                        senderName: `${msg.sender.firstName} ${msg.sender.lastName}`
+                        senderName: `${msg.sender.firstName} ${msg.sender.lastName}`,
+                        content: msg.text // Dodaj mapiranje za `content`
                     })));
+                    console.log('Fetched messages:', data);
+
                 } else {
                     const errorData = await response.json();
                     console.error('Fetch messages failed: ', errorData.message);
@@ -79,21 +89,40 @@ const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boole
         fetchMessages();
 
         // Socket.io za poruke
-        socket.current = io('http://localhost:8000');
-        socket.current.on('connect', () => {
-            console.log('Socket.io connection established for chat');
-        });
+        if (userInState?.id) {
+            socket.current = io('http://localhost:8000', {
+                query: { userId: userInState.id.toString() }
+            });
 
-        socket.current.on('message', (message: Message) => {
-            setMessages((prevMessages) => [...prevMessages, message]);
-        });
+            socket.current.on('connect', () => {
+                console.log('Socket.io connection established for chat');
+            });
 
-        return () => {
-            if (socket.current) {
-                socket.current.disconnect();
-            }
-        };
-    }, [communityId]);
+            socket.current.on('message', (message: Message) => {
+                console.log("Received message from socket:", message);
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages, message];
+                    console.log("Updated messages:", updatedMessages);
+                    return updatedMessages;
+                });
+            });
+
+            socket.current.on('userStatus', ({ userId, status }: { userId: string, status: 'online' | 'offline' }) => {
+                setMembers((prevMembers) => {
+                    const updatedMembers = prevMembers.map(member =>
+                        member.id === Number(userId) ? { ...member, status } : member
+                    );
+                    return updatedMembers;
+                });
+            });
+
+            return () => {
+                if (socket.current) {
+                    socket.current.disconnect();
+                }
+            };
+        }
+    }, [communityId, userInState]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -109,7 +138,30 @@ const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boole
                 message: newMessage,
             };
 
-            socket.current.emit('sendMessage', message);
+            console.log("Sending message:", newMessage);
+
+            // Slanje poruke putem HTTP POST metoda
+            try {
+                const response = await fetch('http://localhost:8000/message/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(message),
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Message saved:', data);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Send message failed:', errorData.message);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+
             setNewMessage('');
         }
     };
@@ -129,6 +181,7 @@ const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boole
                         </div>
                         <div className="chat-sidebar-chat-info">
                             <span>{member.firstName} {member.lastName}</span>
+                            <span className={`status ${member.status}`}>{member.status}</span>
                         </div>
                     </div>
                 ))}
@@ -139,7 +192,7 @@ const ChatSidebar = ({isChatSidebarOpen, communityId}: {isChatSidebarOpen: boole
 
             <div className="chat-sidebar-messages">
                 {messages.map((message, index) => (
-                    <div key={index} className={`chat-message ${message.senderId === 1 ? 'my-message' : 'other-message'}`}>
+                    <div key={index} className={`chat-message ${message.senderId === userInState?.id ? 'my-message' : 'other-message'}`}>
                         <div className="message-sender">{message.senderName}</div>
                         <div className="message-content">{message.content}</div>
                     </div>

@@ -17,18 +17,13 @@ export class MessageService {
 
     async getMessagesByCommunity(communityId: number){
         console.log(`Fetching messages for communityId:` , communityId);
-        
-        // Provera da li je communityId broj
-        if (typeof communityId !== 'number') {
-            console.log("Typeof community not a number");
-            throw new Error(`Invalid communityId: ${communityId} (not a number)`);
-        }
-       
+    
         return this.prisma.message.findMany({
             where: {communityId},
             orderBy: {createdAt: 'asc'},
             include:{
                 sender:true,
+                
             },
 
         });

@@ -19,6 +19,7 @@ import { ChatListenerService } from './chat-mq/chat.listener.service';
 import { ChatGateway } from './chat-mq/chat.gateway';
 import { MessageService } from './message/message.service';
 import { MessageModule } from './message/message.module';
+import { ChatModule } from './chat-mq/chat.module';
 
 @Module({
 
@@ -45,6 +46,7 @@ import { MessageModule } from './message/message.module';
     EventsModule, 
     UserModule,
     MessageModule,
+    ChatModule,
     EventEmitterModule.forRoot(),
     ClientsModule.register([
       {

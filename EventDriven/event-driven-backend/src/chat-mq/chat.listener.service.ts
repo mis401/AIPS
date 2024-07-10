@@ -3,6 +3,8 @@ import { OnEvent } from "@nestjs/event-emitter";
 import { MessageEvent } from "src/events-mq/message-event";
 import { ClientProxy } from "@nestjs/microservices";
 import { ChatGateway } from "./chat.gateway";
+
+
 @Injectable()
 export class ChatListenerService {
     constructor(
@@ -19,6 +21,8 @@ export class ChatListenerService {
             senderId: event.senderId,
             content: event.message,
         };
+
+        console.log("Message", message.content);
 
         this.client.emit('message', message);
         this.chatGateway.sendMessage(message);
