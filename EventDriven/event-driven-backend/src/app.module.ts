@@ -53,7 +53,7 @@ import { ChatModule } from './chat-mq/chat.module';
         name: 'NOTIFICATIONS_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: ['amqp://26.128.205.116:5672'],
           queue: 'notifications_queue',
           queueOptions: {
             durable: true,
