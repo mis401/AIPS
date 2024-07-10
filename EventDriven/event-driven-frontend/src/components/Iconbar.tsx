@@ -18,8 +18,10 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
         return savedNotifications ? JSON.parse(savedNotifications) : [];
     });
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, auth } = useAuth();
     const settingsIconRef = useRef<HTMLDivElement>(null);
+
+    const userInState = auth?.user;
 
     useEffect(() => {
         const socket = io('http://localhost:8000');
@@ -49,6 +51,24 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
         };
     }, []);
 
+    const logoutUser = async (userId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8000/user/logout?id=${userId}`, {
+                method: 'PUT',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                console.log('User logged out successfully');
+            } else {
+                const errorData = await response.json();
+                console.error('Logout failed:', errorData.message);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+
     const openSettingsWindow = () => {
         setIsSettingsOpen(true);
     }
@@ -67,17 +87,10 @@ function IconsBar({ toggleChatSidebar }: { toggleChatSidebar: () => void }) {
 
     const handleSignOut = async () => {
         try {
-            const response = await fetch('/auth/signout', {
-                method: 'GET',
-                credentials: 'include',
-            });
-
-            if (response.ok) {
-                navigate('/auth');
+            if (userInState?.id) {
+                await logoutUser(userInState.id);
                 logout();
-            } else {
-                const errorData = await response.json();
-                console.error('Signout failed: ', errorData.message);
+                navigate('/auth');
             }
         } catch (error) {
             console.error('Fetch error:', error);

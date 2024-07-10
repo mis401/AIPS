@@ -39,8 +39,5 @@ export class MessageController {
         return this.messageService.getMessagesByCommunity(Number(communityId));
     }
 
-    @Get('statuses')
-    async getUserStatuses(){
-        return this.chatGateway.getAllUserStatuses();
-    }
+
 }

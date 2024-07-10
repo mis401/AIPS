@@ -6,6 +6,39 @@ import { FullUserInfo } from 'src/dtos/full-user-info.dto';
 export class UserService {
  constructor(private prisma: PrismaService) {}
  
+ async updateUserStatus(userId: number, status: 'online' | 'offline') {
+    try {
+      const numericUserId = Number(userId); // Konvertuj u broj
+      if (isNaN(numericUserId)) {
+        throw new Error('Invalid user ID');
+      }
+
+      console.log(`Updating status for user ID: ${numericUserId} to ${status}`);
+      const result = await this.prisma.user.update({
+        where: { id: numericUserId },
+        data: { status },
+      });
+      console.log('Status updated successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      throw error;
+    }
+  }
+
+  async logoutUser(userId: number) {
+    try {
+      console.log(`Logging out user with ID: ${userId}`);
+      const result = await this.updateUserStatus(userId, 'offline');
+      console.log('User status updated to offline:', result);
+      return result;
+    } catch (error) {
+      console.error('Error logging out user:', error);
+      throw error;
+    }
+  }
+
+ 
  async getUserById(id: number) {
     try{
         const userId = Number(id);

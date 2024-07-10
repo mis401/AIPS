@@ -33,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
             setCommunities([...array]);
             
             onDefaultCommunitySet(array[0].name, array[0].id);
+            
           });
         }
       });

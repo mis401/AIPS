@@ -23,6 +23,7 @@ model User {
   managingCommunities Community[] @relation("managers")
   communities         Community[] @relation("memberOf")
   subscribedTo        Document[]  @relation("subscriptions")
+  status              String      @default("offline") 
 }
 
 model Community {

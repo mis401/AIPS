@@ -8,10 +8,7 @@ interface Member {
     firstName: string;
     lastName: string;
     email: string;
-}
-
-interface MemberWithStatus extends Member {
-    status: 'online' | 'offline';
+    status: 'online' | 'offline'; // Dodato polje za status
 }
 
 interface Message {
@@ -23,7 +20,7 @@ interface Message {
 
 const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: boolean, communityId: number }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [members, setMembers] = useState<MemberWithStatus[]>([]);
+    const [members, setMembers] = useState<Member[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const socket = useRef<any>(null);
@@ -43,13 +40,11 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                     method: 'GET',
                     credentials: 'include',
                 });
-
+    
                 if (response.ok) {
                     const data = await response.json();
-                    setMembers(data.map((member: Member) => ({
-                        ...member,
-                        status: 'offline', // default status
-                    })));
+                    setMembers(data);
+                    console.log('Fetched members:', data);
                 } else {
                     const errorData = await response.json();
                     console.error('Fetch members failed: ', errorData.message);
@@ -58,24 +53,22 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 console.error('Fetch error:', error);
             }
         };
-
+    
         const fetchMessages = async () => {
             try {
-                console.log(communityId);
                 const response = await fetch(`http://localhost:8000/message/messages?communityId=${communityId}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
-
+    
                 if (response.ok) {
                     const data = await response.json();
                     setMessages(data.map((msg: any) => ({
                         ...msg,
                         senderName: `${msg.sender.firstName} ${msg.sender.lastName}`,
-                        content: msg.text // Dodaj mapiranje za `content`
+                        content: msg.text
                     })));
                     console.log('Fetched messages:', data);
-
                 } else {
                     const errorData = await response.json();
                     console.error('Fetch messages failed: ', errorData.message);
@@ -84,38 +77,29 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 console.error('Fetch error:', error);
             }
         };
-
+    
         fetchMembers();
         fetchMessages();
-
-        // Socket.io za poruke
+    
         if (userInState?.id) {
             socket.current = io('http://localhost:8000', {
                 query: { userId: userInState.id.toString() }
             });
-
+    
             socket.current.on('connect', () => {
                 console.log('Socket.io connection established for chat');
             });
-
+    
             socket.current.on('message', (message: Message) => {
-                console.log("Received message from socket:", message);
-                setMessages((prevMessages) => {
-                    const updatedMessages = [...prevMessages, message];
-                    console.log("Updated messages:", updatedMessages);
-                    return updatedMessages;
-                });
+                setMessages((prevMessages) => [...prevMessages, message]);
             });
-
-            socket.current.on('userStatus', ({ userId, status }: { userId: string, status: 'online' | 'offline' }) => {
-                setMembers((prevMembers) => {
-                    const updatedMembers = prevMembers.map(member =>
-                        member.id === Number(userId) ? { ...member, status } : member
-                    );
-                    return updatedMembers;
-                });
+    
+            socket.current.on('userStatus', async ({ userId, status }: { userId: string, status: 'online' | 'offline' }) => {
+                console.log(`User status update: ${userId} is now ${status}`);
+                // Osveži članove povlačenjem iz baze
+                await fetchMembers();
             });
-
+    
             return () => {
                 if (socket.current) {
                     socket.current.disconnect();
@@ -123,13 +107,13 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
             };
         }
     }, [communityId, userInState]);
-
+    
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
-
+    
     const handleSendMessage = async () => {
         if (newMessage.trim() !== '') {
             const message = {
@@ -137,10 +121,7 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 senderId: userInState?.id,
                 message: newMessage,
             };
-
-            console.log("Sending message:", newMessage);
-
-            // Slanje poruke putem HTTP POST metoda
+    
             try {
                 const response = await fetch('http://localhost:8000/message/send', {
                     method: 'POST',
@@ -150,7 +131,7 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                     body: JSON.stringify(message),
                     credentials: 'include',
                 });
-
+    
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Message saved:', data);
@@ -161,11 +142,11 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
             } catch (error) {
                 console.error('Fetch error:', error);
             }
-
+    
             setNewMessage('');
         }
     };
-
+    
     return (
         <div className={`chat-sidebar ${isChatSidebarOpen ? '' : 'closed'}`}>
             <div className="chat-sidebar-header">
@@ -173,23 +154,23 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                     <h1>Chats</h1>
                 </div>
             </div>
-
+    
             <div className="chat-sidebar-chats">
                 {members.map((member) => (
                     <div key={member.id} className="chat-sidebar-chat">
                         <div className="chat-sidebar-chat-avatar">
+                            {/* Možeš dodati sliku avatara ovde */}
                         </div>
                         <div className="chat-sidebar-chat-info">
                             <span>{member.firstName} {member.lastName}</span>
-                            <span className={`status ${member.status}`}>{member.status}</span>
+                            <span className={`status ${member.status}`} style={{ color: member.status === 'online' ? 'green' : 'red' }}>
+                                {member.status}
+                            </span>
                         </div>
                     </div>
                 ))}
-                <div className="chat-sidebar-chat">
-                    <div className="chat-sidebar-chat-avatar"></div>
-                </div>
             </div>
-
+    
             <div className="chat-sidebar-messages">
                 {messages.map((message, index) => (
                     <div key={index} className={`chat-message ${message.senderId === userInState?.id ? 'my-message' : 'other-message'}`}>
@@ -199,7 +180,7 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 ))}
                 <div ref={messagesEndRef} />
             </div>
-
+    
             <div className="chat-sidebar-footer">
                 <input 
                     type="text" 

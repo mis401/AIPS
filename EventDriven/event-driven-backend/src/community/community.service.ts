@@ -97,6 +97,7 @@ export class CommunityService {
                             firstName: true,
                             lastName: true,
                             email: true,
+                            status: true,
                         },
                     },
                     createdUser: {

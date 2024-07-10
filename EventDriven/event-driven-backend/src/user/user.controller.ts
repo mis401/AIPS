@@ -26,4 +26,18 @@ export class UserController {
     async manageCommunity(@Body('userId') userId: number, @Body('communityId') communityId: number) {
         return await this.userService.manageCommunity(userId, communityId);
     }
+
+    @Put('logout')
+  async logout(@Query('id') id: number) {
+    try {
+      const numericId = Number(id); // Konvertuj u broj
+      if (isNaN(numericId)) {
+        throw new Error('Invalid user ID');
+      }
+      return await this.userService.logoutUser(numericId);
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw new Error('Logout failed');
+    }
+  }
 }
