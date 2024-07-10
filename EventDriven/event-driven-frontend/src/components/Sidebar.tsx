@@ -31,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
           data.then((array) => {
             console.log('Communities data:', array)
             setCommunities([...array]);
-            
+            if (array.length != 0)
             onDefaultCommunitySet(array[0].name, array[0].id);
             
           });
