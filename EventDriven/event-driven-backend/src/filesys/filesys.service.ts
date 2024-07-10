@@ -68,7 +68,14 @@ export class FilesysService {
 
     async saveDocumentContent(docPath: string, content: string) {
         try {
-            await fs.writeFile(docPath, content);
+            if (docPath.endsWith('.png')) {
+                // Save base64 image content
+                const base64Data = content.replace(/^data:image\/png;base64,/, '');
+                await fs.writeFile(docPath, base64Data, 'base64');
+            } else {
+                // Save text content
+                await fs.writeFile(docPath, content);
+            }
         } catch (e) {
             console.log(e.message);
             throw e;

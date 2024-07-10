@@ -4,9 +4,10 @@ import useAuth from '../hooks/useAuth';
 
 interface SidebarProps {
   onCommunitySelect: (communityName: string, communityId: number) => void;
+  onDefaultCommunitySet: (defaultCommunityName: string, defaultCommunityId : number) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCommunitySet }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [newCommunityName, setNewCommunityName] = useState<string>('');
@@ -30,6 +31,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect }) => {
           data.then((array) => {
             console.log('Communities data:', array)
             setCommunities([...array]);
+            
+            onDefaultCommunitySet(array[0].name, array[0].id);
           });
         }
       });

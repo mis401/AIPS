@@ -4,7 +4,7 @@ import '../styles/DocumentEditorDialog.css';
 import textFileIcon from '../assets/images/text-file.png';
 import todoListIcon from '../assets/images/todo-list.png';
 import whiteboardIcon from '../assets/images/whiteboard.png';
-import undoIcon from '../assets/images/undo.png'; // Import the undo button image
+import undoIcon from '../assets/images/undo.png';
 import { DocumentType } from '../dtos/NewDocument';
 
 interface DocumentEditorDialogProps {
@@ -20,7 +20,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#000000');
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [lineWidth, setLineWidth] = useState(2); // Default line width
+  const [lineWidth, setLineWidth] = useState(2);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const historyRef = useRef<ImageData[]>([]);
 
@@ -43,7 +43,25 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   }, [docType]);
 
   const handleSave = () => {
-    const formattedContent = docType === DocumentType.TODO ? todoItems.join('\n') : content;
+    let formattedContent = content;
+    if (docType === DocumentType.TODO) {
+      formattedContent = todoItems.join('\n');
+    } else if (docType === DocumentType.WHITEBOARD) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const offScreenCanvas = document.createElement('canvas');
+        offScreenCanvas.width = canvas.width;
+        offScreenCanvas.height = canvas.height;
+        const offScreenCtx = offScreenCanvas.getContext('2d');
+
+        if (offScreenCtx) {
+          offScreenCtx.fillStyle = 'white';
+          offScreenCtx.fillRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
+          offScreenCtx.drawImage(canvas, 0, 0);
+          formattedContent = offScreenCanvas.toDataURL('image/png');
+        }
+      }
+    }
     onSave(formattedContent, docType);
     onClose();
   };
@@ -86,15 +104,14 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
       const rect = canvas.getBoundingClientRect();
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Save current state to history before starting a new drawing action
         historyRef.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-        if (historyRef.current.length > 50) { // Limit history size
+        if (historyRef.current.length > 50) {
           historyRef.current.shift();
         }
         ctx.beginPath();
         ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth; // Set the line width here
+        ctx.lineWidth = lineWidth;
         setIsDrawing(true);
       }
     }

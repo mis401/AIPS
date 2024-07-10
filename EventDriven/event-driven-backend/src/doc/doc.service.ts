@@ -50,7 +50,6 @@ export class DocService {
                 }
             });
 
-            // Save the content to the file system
             await this.filesys.saveDocumentContent(documentPath, newDoc.content);
 
             return doc;
