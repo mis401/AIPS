@@ -64,7 +64,7 @@ import { ChatModule } from './chat-mq/chat.module';
         name:"MESSAGES_SERVICE",
         transport:Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: ['amqp://26.128.205.116:5672'],
           queue: 'messages_queue',
           queueOptions: {
             durable: true,
