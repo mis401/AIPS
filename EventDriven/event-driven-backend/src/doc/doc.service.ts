@@ -51,7 +51,7 @@ export class DocService {
                 }
             });
 
-            await this.filesys.saveDocumentContent(documentPath, newDoc.content);
+            //await this.filesys.saveDocumentContent(documentPath, newDoc.content);
 
             return doc;
         } catch (error) {

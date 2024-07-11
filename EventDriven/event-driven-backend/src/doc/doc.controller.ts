@@ -32,6 +32,7 @@ export class DocController {
             calendarId: information.calendarId,
             content
         }
+        console.log(fullDoc);
         return fullDoc;
     }
     

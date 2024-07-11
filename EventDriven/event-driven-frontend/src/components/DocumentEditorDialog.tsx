@@ -27,6 +27,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   const historyRef = useRef<ImageData[]>([]);
 
   useEffect(() => {
+    console.log("Content:", content);
     setCurrentContent(content);
     setDocType(type);
     if (type === DocumentType.TODO) {
@@ -41,7 +42,17 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (!currentContent) {
+          ctx.fillStyle='white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        else {
+          const img = new Image();
+          img.src = content;
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+          }
+        }
       }
     }
   }, [docType]);
@@ -123,6 +134,8 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
       if (ctx) {
         ctx.closePath();
         setIsDrawing(false);
+        console.log("canvas url: ", canvas.toDataURL());
+        setCurrentContent(canvas.toDataURL());
       }
     }
   };
