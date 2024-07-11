@@ -18,7 +18,8 @@ export class DocService {
             });
             const path: string = `/${community.name}/${newDoc.name}`;
             let documentPath = null;
-
+            const oldDay = newDoc.day;
+            newDoc.day = newDoc.day.slice(0, 9);
             switch(newDoc.type) {
                 case DocumentType.DOCUMENT:
                     documentPath = await this.filesys.generateTextDocument(newDoc, user, community);
@@ -34,7 +35,7 @@ export class DocService {
             if (documentPath === null) {
                 throw new Error('Document creation failed');
             }
-
+            newDoc.day=oldDay;
             const doc = await this.prisma.document.create({
                 data: {
                     name: newDoc.name,
@@ -57,6 +58,8 @@ export class DocService {
             throw new InternalServerErrorException(error.message);
         }
     }
+
+    
 
     async getDocumentInformation(id: number) {
         try {

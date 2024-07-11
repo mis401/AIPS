@@ -14,13 +14,22 @@ export class FilesysService {
 
     async generateTextDocument(newDoc: NewDocumentDTO, user: User, community: Community) {
         try {
-            let docPath: string = `./files/${community.name}/${newDoc.name}.txt`;
-            const found: boolean = await fs.pathExists(docPath);
-            if (found) {
-                newDoc.name = `${newDoc.name} (1)`;
-                docPath = `./files/${community.name}/${newDoc.name}.txt`;
+            let docPath: string = `./files/${community.name}/${newDoc.day}/${newDoc.name}.txt`;
+            let duplicate : number = 0;
+            let duplicateString: string;
+            let found: boolean = await fs.pathExists(docPath);
+            while (found) {
+                duplicate++;
+                duplicateString = ` ${duplicate}`;
+                newDoc.name = `${newDoc.name}${duplicateString}`;
+                docPath = `./files/${community.name}/${newDoc.day}/${newDoc.name}.txt`;
+                found = await fs.pathExists(docPath);
             }
-            await fs.outputFile(docPath, "");
+            console.log(newDoc)
+            if (!newDoc.content){
+                newDoc.content = "";
+            }
+            await fs.outputFile(docPath, newDoc.content);
             return docPath;
         } catch (e) {
             console.log(e.message);
@@ -34,15 +43,23 @@ export class FilesysService {
             const context = canvas.getContext('2d');
             context.fillStyle = 'white';
             context.fillRect(0, 0, canvas.width, canvas.height);
-            let docPath: string = `./files/${community.name}/${newDoc.name}.png`;
-            const found: boolean = await fs.pathExists(docPath);
+            let docPath: string = `./files/${community.name}/${newDoc.day}/${newDoc.name}.png`;
 
-            if (found) {
-                newDoc.name = `${newDoc.name} (1)`;
-                docPath = `./files/${community.name}/${newDoc.name}.png`;
+            let duplicate : number = 0;
+            let duplicateString: string;
+            let found: boolean = await fs.pathExists(docPath);
+            while (found) {
+                duplicate++;
+                duplicateString = ` ${duplicate}`;
+                newDoc.name = `${newDoc.name}${duplicateString}`;
+                docPath = `./files/${community.name}/${newDoc.day}/${newDoc.name}.png`;
+                found = await fs.pathExists(docPath);
             }
-            
-            await fs.outputFile(docPath, canvas.toBuffer('image/png'));
+            if (!newDoc.content) {
+                newDoc.content = canvas.toDataURL();
+            }
+            const base64Data = newDoc.content.replace(/^data:image\/png;base64,/, '');
+            await fs.writeFile(docPath, base64Data, 'base64');
             return docPath;
         } catch (e) {
             console.log(e.message);
@@ -52,13 +69,21 @@ export class FilesysService {
 
     async generateTodoDocument(newDoc: NewDocumentDTO, user: User, community: Community) {
         try {
-            let docPath: string = `./files/${community.name}/${newDoc.name}.md`;
-            const found: boolean = await fs.pathExists(docPath);
-            if (found) {
-                newDoc.name = `${newDoc.name} (1)`;
-                docPath = `./files/${community.name}/${newDoc.name}.md`;
+            let docPath: string = `./files/${community.name}/${newDoc.day}/${newDoc.name}.md`;
+            let duplicate : number = 0;
+            let duplicateString: string;
+            let found: boolean = await fs.pathExists(docPath);
+            while (found) {
+                duplicate++;
+                duplicateString = ` ${duplicate}`;
+                newDoc.name = `${newDoc.name}${duplicateString}`;
+                docPath = `./files/${community.name}/${newDoc.day}/${newDoc.name}.md`;
+                found = await fs.pathExists(docPath);
             }
-            await fs.outputFile(docPath, "");
+            if (!newDoc.content){
+                newDoc.content = "";
+            }
+            await fs.outputFile(docPath, newDoc.content);
             return docPath;
         } catch (e) {
             console.log(e.message);
@@ -94,7 +119,7 @@ export class FilesysService {
 
     async getWhiteboardDocument(docPath: string) {
         try {
-            const content: File = await fs.readFile(docPath, 'utf8')
+            const content: string = await fs.readFile(docPath, 'utf8')
             return content;
         } catch (e) {
             console.log(e.message);
