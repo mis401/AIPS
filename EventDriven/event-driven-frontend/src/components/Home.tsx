@@ -28,19 +28,26 @@ function Home() {
 
     return (
         <div className={`container ${isChatSidebarOpen ? 'chat-sidebar-open' : ''}`}>
-           <Sidebar onCommunitySelect={handleCommunitySelect}
-                onDefaultCommunitySet={handleDefaultCommunitySet}/>
-           {selectedCommunityId !== null && (
-               <Calendar communityName={selectedCommunity}
-               communityId={selectedCommunityId}/>
-           )}
-           <IconsBar toggleChatSidebar={toggleChatSidebar} isChatSidebarOpen={isChatSidebarOpen}/>   
-           {selectedCommunityId !== null && (
-               <ChatSidebar 
-                   isChatSidebarOpen={isChatSidebarOpen} 
-                   communityId={selectedCommunityId} 
-               />
-           )}
+            <Sidebar 
+                onCommunitySelect={handleCommunitySelect}
+                onDefaultCommunitySet={handleDefaultCommunitySet}
+            />
+            {selectedCommunityId !== null && (
+                <Calendar 
+                    communityName={selectedCommunity}
+                    communityId={selectedCommunityId}
+                />
+            )}
+            <IconsBar 
+                toggleChatSidebar={toggleChatSidebar} 
+                isChatSidebarOpen={isChatSidebarOpen} 
+            />
+            {selectedCommunityId !== null && (
+                <ChatSidebar 
+                    isChatSidebarOpen={isChatSidebarOpen} 
+                    communityId={selectedCommunityId} 
+                />
+            )}
         </div>
     );
 }

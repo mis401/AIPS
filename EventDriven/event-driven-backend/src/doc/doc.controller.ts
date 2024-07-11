@@ -1,16 +1,16 @@
 import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Post, Query, Req, ValidationPipe } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
-
 import { FullDocument } from 'src/dtos/document.interface';
 import { info } from 'console';
-
 import { UserService } from 'src/user/user.service';
+
 
 
 @Controller('doc')
 export class DocController {
     constructor(private DocService: DocService) {
+        
     }
 
     @Get('get')

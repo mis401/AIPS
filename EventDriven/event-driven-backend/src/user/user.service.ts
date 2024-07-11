@@ -7,7 +7,7 @@ export class UserService {
  constructor(private prisma: PrismaService) {}
  
  
- async updateUserStatus(userId: number, status: 'online' | 'offline' | 'idle' | 'working', currentDocument?: string) {
+  async updateUserStatus(userId: number, status: 'online' | 'offline' | 'idle' | 'working', currentDocument?: string) {
     try {
       const numericUserId = Number(userId); // Konvertuj u broj
       if (isNaN(numericUserId)) {
