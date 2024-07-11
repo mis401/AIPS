@@ -70,7 +70,18 @@ import { ChatModule } from './chat-mq/chat.module';
             durable: true,
           }
         }
-      }
+      },
+      {
+        name:"COLLAB_SERVICE",
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://26.128.205.116:5672'],
+          queue: 'collab_queue',
+          queueOptions:{
+            durable: true
+          }
+        }
+      },
     ]),
   ],
 })
