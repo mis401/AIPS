@@ -40,10 +40,4 @@ export class UserController {
       throw new Error('Logout failed');
     }
   }
-  @Put('currentDocument')
-  async updateCurrentDocument(@Query('id') id: number, @Body('document') document: string | null) {
-    const updatedUser = await this.userService.updateUserCurrentDocument(Number(id), document);
-    console.log('Updated user in controller:', updatedUser); // Dodaj log da proveriš vrednost
-    return updatedUser;
-  }
 }
