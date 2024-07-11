@@ -158,7 +158,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
       const response = await fetch(`http://localhost:8000/doc/get?id=${documentId}`);
       if (response.ok) {
         const data = await response.json();
-        setCurrentDocument({ content: data.content, type: data.information.type });
+        setCurrentDocument({ content: data.content, type: data.type });
         setOpenEditor(true);
       } else {
         console.error('Failed to fetch document content');

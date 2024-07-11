@@ -2,10 +2,15 @@ import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, 
 import { DocService } from './doc.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 
+import { FullDocument } from 'src/dtos/document.interface';
+import { info } from 'console';
+
+import { UserService } from 'src/user/user.service';
+
+
 @Controller('doc')
 export class DocController {
     constructor(private DocService: DocService) {
-        
     }
 
     @Get('get')
@@ -16,7 +21,18 @@ export class DocController {
         }
         const information =  await this.DocService.getDocumentInformation(idNum);
         const content = await this.DocService.getDocumentContent(idNum);
-        return {information, content};
+        const fullDoc: FullDocument = {
+            id: information.id,
+            name: information.name,
+            day: information.day,
+            createdById: information.createdById,
+            createdAt: information.createdAt,
+            updatedAt: information.updatedAt,
+            type: information.type,
+            calendarId: information.calendarId,
+            content
+        }
+        return fullDoc;
     }
     
     @Get('get-docs-calendar-month')

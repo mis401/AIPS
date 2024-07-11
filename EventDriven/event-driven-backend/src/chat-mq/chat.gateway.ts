@@ -2,6 +2,10 @@ import { WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, 
 import { Server, Socket } from "socket.io";
 import { UserService } from "src/user/user.service";
 
+export interface UserStatus {
+    [key: string]: 'online' | 'offline';
+}
+
 @WebSocketGateway({
     cors: {
         origin: 'http://localhost:3000',
@@ -15,32 +19,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     afterInit(server: Server) {
         console.log('WebSocket server initialized');
-        this.userService.setServer(server);
     }
 
     async handleConnection(client: Socket) {
         const userId = client.handshake.query.userId;
-        const communityId = client.handshake.query.communityId;
-        if (userId && communityId) {
-            const user = await this.userService.updateUserStatus(Number(userId), 'online', Number(communityId));
-            this.server.to(`community_${communityId}`).emit('userStatus', {
-                userId,
-                status: 'online',
-                currentDocument: user.currentDocument,
-            });
+        if (userId) {
+            await this.userService.updateUserStatus(Number(userId), 'online');
+            this.server.emit('userStatus', { userId, status: 'online' });
         }
     }
 
     async handleDisconnect(client: Socket) {
         const userId = client.handshake.query.userId;
-        const communityId = client.handshake.query.communityId;
-        if (userId && communityId) {
-            const user = await this.userService.updateUserStatus(Number(userId), 'offline', Number(communityId));
-            this.server.to(`community_${communityId}`).emit('userStatus', {
-                userId,
-                status: 'offline',
-                currentDocument: user.currentDocument,
-            });
+        if (userId) {
+            await this.userService.updateUserStatus(Number(userId), 'offline');
+            this.server.emit('userStatus', { userId, status: 'offline' });
         }
     }
 
