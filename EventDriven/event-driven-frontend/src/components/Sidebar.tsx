@@ -9,6 +9,8 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCommunitySet }) => {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openLeaveDialog, setOpenLeaveDialog] = useState(false);
+  const [selectedCommunity, setSelectedCommunity] = useState<{ name: string, id: number } | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [newCommunityName, setNewCommunityName] = useState<string>('');
   const [communityCode, setCommunityCode] = useState<string>('');
@@ -31,9 +33,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
           data.then((array) => {
             console.log('Communities data:', array)
             setCommunities([...array]);
-            if (array.length != 0)
-            onDefaultCommunitySet(array[0].name, array[0].id);
-            
+            if (array.length !== 0) {
+              onDefaultCommunitySet(array[0].name, array[0].id);
+            }
           });
         }
       });
@@ -45,11 +47,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
     setIsCommunityWindowOpen(prevState => !prevState);
   };
 
-  function handleOptionChange(option: string) {
-    setSelectedOption(option);
-  }
+  const handleLeaveDialogToggle = () => {
+    setOpenLeaveDialog(!openLeaveDialog);
+    setIsCommunityWindowOpen(!openLeaveDialog); // Toggle add community button
+  };
 
-  function handleCreateButtonClick() {
+  const handleOptionChange = (option: string) => {
+    setSelectedOption(option);
+  };
+
+  const handleCreateButtonClick = () => {
     if (selectedOption === 'Create a community') {
       fetch('http://localhost:8000/community/create', {
         method: 'POST',
@@ -92,11 +99,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
     else{
       handleDialogToggle();
     }
-  }
+  };
 
   const handleCommunityClick = (communityName: string, communityId: number) => {
     onCommunitySelect(communityName, Number(communityId)); // Ensure communityId is a number
-  }
+  };
+
+  const handleLeaveCommunity = async () => {
+    if (selectedCommunity) {
+      await fetch('http://localhost:8000/community/leave', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userInState?.id,
+          communityId: selectedCommunity.id,
+        }),
+      });
+      setCommunities(prev => prev.filter(community => community.id !== selectedCommunity.id));
+      handleLeaveDialogToggle();
+    }
+  };
 
   return (
     <aside className="sidebar">
@@ -110,8 +134,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
       <div className='scrollable-communities'>
         <div className="communities-section">
           {communities.map((community) => (
-            <div key={community.id} className="community" onClick={() => handleCommunityClick(community.name, community.id)}>
-              <span>{community.name}</span>
+            <div key={community.id} className="community-container">
+              <div className="community-name" onClick={() => handleCommunityClick(community.name, community.id)}>
+                <span>{community.name}</span>
+              </div>
+              <button className="leave-button" onClick={() => { setSelectedCommunity(community); handleLeaveDialogToggle(); }}>X</button>
             </div>
           ))}
         </div>
@@ -131,6 +158,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCommunitySelect, onDefaultCo
         onCommunityCodeChange={(code) => setCommunityCode(code)}
         onOptionChange={handleOptionChange}  
       />  
+
+      {openLeaveDialog && selectedCommunity && (
+        <div className="leave-community-dialog">
+          <p>Are you sure you want to leave the community {selectedCommunity.name}?</p>
+          <button onClick={handleLeaveCommunity}>OK</button>
+          <button onClick={handleLeaveDialogToggle}>Cancel</button>
+        </div>
+      )}
     </aside>
   );
 };

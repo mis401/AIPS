@@ -4,7 +4,7 @@ import { CommunityService } from './community.service';
 @Controller('community')
 export class CommunityController {
     constructor(private communityService: CommunityService) {}
-    
+
     @Get('get-for-user')
     async getUserCommunities(@Query('userId') userId: string) {
         const res = await this.communityService.getUserCommunities(parseInt(userId));
@@ -36,8 +36,7 @@ export class CommunityController {
     async createCommunity(
         @Body('name') name: string,
         @Body('userId') userId: number
-    )
-    {
+    ) {
         return await this.communityService.createCommunity(name, userId);
     }
 }

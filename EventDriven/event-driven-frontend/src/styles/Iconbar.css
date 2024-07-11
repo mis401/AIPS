@@ -38,3 +38,6 @@
     cursor: pointer;
 }
 
+.settings-option:hover {
+   cursor: pointer;
+}

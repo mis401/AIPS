@@ -132,10 +132,8 @@ function IconsBar({ toggleChatSidebar, isChatSidebarOpen }: { toggleChatSidebar:
             {isSettingsOpen && (
                 <Window onClose={closeSettingsWindow} top={getSettingsWindowTopPosition()}>
                     <ul className="settings-options">
-                        <li onClick={handleSignOut}>Log out</li>
-                        {/* Add more options here */}
-                        <li>Option 2</li>
-                        <li>Option 3</li>
+                        <li className="settings-option" onClick={handleSignOut}>Log out</li>
+                        <li>Manage your account</li>
                     </ul>
                 </Window>
             )}
