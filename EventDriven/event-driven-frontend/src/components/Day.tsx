@@ -70,26 +70,26 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
     }
   };
 
-  const updateCurrentDocumentStatus = async (documentName: string | null) => {
-    console.log(`Updating current document status to: ${documentName}`);
-    try {
-      const response = await fetch(`http://localhost:8000/user/currentDocument?id=${userInState?.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ document: documentName }),
-      });
+  // const updateCurrentDocumentStatus = async (documentName: string | null) => {
+  //   console.log(`Updating current document status to: ${documentName}`);
+  //   try {
+  //     const response = await fetch(`http://localhost:8000/user/currentDocument?id=${userInState?.id}`, {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ document: documentName }),
+  //     });
 
-      if (response.ok) {
-        console.log('Document status updated successfully');
-      } else {
-        console.error('Failed to update document status');
-      }
-    } catch (error) {
-      console.error('Error updating document status:', error);
-    }
-  };
+  //     if (response.ok) {
+  //       console.log('Document status updated successfully');
+  //     } else {
+  //       console.error('Failed to update document status');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error updating document status:', error);
+  //   }
+  // };
 
   return (
     <div
@@ -102,7 +102,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         </label>
         <div className="documents">
           {day.documents?.map((doc) => (
-            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id, doc.name); updateCurrentDocumentStatus(doc.name); }}>
+            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id, doc.name);}}>
               {doc.name}
             </div>
           ))}
@@ -117,7 +117,6 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         open={openEditor}
         onClose={() => {
           setOpenEditor(false);
-          updateCurrentDocumentStatus(null);
         }}
         onSave={handleSaveDocument}
       />

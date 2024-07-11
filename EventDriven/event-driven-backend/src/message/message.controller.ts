@@ -28,7 +28,7 @@ export class MessageController {
         console.log("New message: ", newMessage.text);
         this.eventEmitter.emit(
             'message.send',
-            new MessageEvent(communityId, newMessage.senderId, message)
+            new MessageEvent(communityId, senderId, message)
         );
 
         return newMessage;

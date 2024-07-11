@@ -90,9 +90,6 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 console.log('Socket.io connection established for chat');
             });
     
-            socket.current.on('message', (message: Message) => {
-                setMessages((prevMessages) => [...prevMessages, message]);
-            });
     
             socket.current.on('userStatus', async ({ userId, status }: { userId: string, status: 'online' | 'offline' }) => {
                 console.log(`User status update: ${userId} is now ${status}`);
@@ -135,6 +132,18 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Message saved:', data);
+
+                    // Dodaj poruku odmah nakon što je poslana
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        {
+                            senderId: data.senderId,
+                            communityId: data.communityId,
+                            content: data.text,
+                            senderName: `${userInState?.firstName} ${userInState?.lastName}`
+                        }
+                    ]);
+                    setNewMessage('');
                 } else {
                     const errorData = await response.json();
                     console.error('Send message failed:', errorData.message);
@@ -143,7 +152,6 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 console.error('Fetch error:', error);
             }
     
-            setNewMessage('');
         }
     };
     

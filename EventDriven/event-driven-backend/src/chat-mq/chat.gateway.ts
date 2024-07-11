@@ -37,10 +37,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('send')
-    handleMessage(client: Socket, @MessageBody() message: any): void {
-        this.sendMessage(message);
-    }
+   
 
     sendMessage(message: any) {
         this.server.emit('message', message);
