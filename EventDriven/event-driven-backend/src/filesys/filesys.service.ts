@@ -58,8 +58,9 @@ export class FilesysService {
             if (!newDoc.content) {
                 newDoc.content = canvas.toDataURL();
             }
+            console.log(newDoc.content)
             const base64Data = newDoc.content.replace(/^data:image\/png;base64,/, '');
-            await fs.writeFile(docPath, base64Data, 'base64');
+            await fs.outputFile(docPath, base64Data, 'base64');
             return docPath;
         } catch (e) {
             console.log(e.message);
@@ -96,10 +97,10 @@ export class FilesysService {
             if (docPath.endsWith('.png')) {
                 // Save base64 image content
                 const base64Data = content.replace(/^data:image\/png;base64,/, '');
-                await fs.writeFile(docPath, base64Data, 'base64');
+                await fs.outputFile(docPath, base64Data, 'base64');
             } else {
                 // Save text content
-                await fs.writeFile(docPath, content);
+                await fs.outputFile(docPath, content);
             }
         } catch (e) {
             console.log(e.message);
@@ -119,7 +120,8 @@ export class FilesysService {
 
     async getWhiteboardDocument(docPath: string) {
         try {
-            const content: string = await fs.readFile(docPath, 'utf8')
+            const content: string = await fs.readFile(docPath, 'base64')
+            console.log(content)
             return content;
         } catch (e) {
             console.log(e.message);

@@ -3,6 +3,7 @@ import Day from "./Day";
 import "../styles/Calendar.css";
 import { DocumentType, NewDocumentDTO } from '../dtos/NewDocument';
 import DocumentEditorDialog from "./DocumentEditorDialog";
+import { FullDocument } from "../dtos/full-document.interface";
 
 export interface DayObject {
   day: number;
@@ -157,7 +158,11 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
     try {
       const response = await fetch(`http://localhost:8000/doc/get?id=${documentId}`);
       if (response.ok) {
-        const data = await response.json();
+        const data: FullDocument = await response.json();
+        if (data.type === DocumentType.WHITEBOARD){
+          data.content = "data:image/png;base64," + data.content
+          console.log(data.content);
+        }
         setCurrentDocument({ content: data.content, type: data.type });
         setOpenEditor(true);
       } else {
