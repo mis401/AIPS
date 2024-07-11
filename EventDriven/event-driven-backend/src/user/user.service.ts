@@ -1,21 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { FullUserInfo } from 'src/dtos/full-user-info.dto';
-import { Server } from 'socket.io';
 
 @Injectable()
 export class UserService {
-  private server: Server;
-
-  constructor(private prisma: PrismaService) {}
-
-  setServer(server: Server) {
-    this.server = server;
-  }
+ constructor(private prisma: PrismaService) {}
  
-  async updateUserStatus(userId: number, status: 'online' | 'offline', communityId?: number) {
+ 
+ async updateUserStatus(userId: number, status: 'online' | 'offline' | 'idle' | 'working', currentDocument?: string) {
     try {
-      const numericUserId = Number(userId); 
+      const numericUserId = Number(userId); // Konvertuj u broj
       if (isNaN(numericUserId)) {
         throw new Error('Invalid user ID');
       }
@@ -23,24 +17,8 @@ export class UserService {
       console.log(`Updating status for user ID: ${numericUserId} to ${status}`);
       const result = await this.prisma.user.update({
         where: { id: numericUserId },
-        data: { status },
+        data: { status, currentDocument: status === 'working' ? currentDocument : null },
       });
-
-      // Emit to specific community if provided
-      if (communityId) {
-        this.server.to(`community_${communityId}`).emit('userStatus', {
-          userId: numericUserId,
-          status: result.status,
-          currentDocument: result.currentDocument,
-        });
-      } else {
-        this.server.emit('userStatus', {
-          userId: numericUserId,
-          status: result.status,
-          currentDocument: result.currentDocument,
-        });
-      }
-
       console.log('Status updated successfully:', result);
       return result;
     } catch (error) {
@@ -49,10 +27,10 @@ export class UserService {
     }
   }
 
-  async logoutUser(userId: number, communityId?: number) {
+  async logoutUser(userId: number) {
     try {
       console.log(`Logging out user with ID: ${userId}`);
-      const result = await this.updateUserStatus(userId, 'offline', communityId);
+      const result = await this.updateUserStatus(userId, 'offline');
       console.log('User status updated to offline:', result);
       return result;
     } catch (error) {
@@ -61,27 +39,7 @@ export class UserService {
     }
   }
 
-  async updateUserCurrentDocument(userId: number, document: string | null) {
-    const numericUserId = Number(userId);
-    if (isNaN(numericUserId)) {
-      throw new Error('Invalid user ID');
-    }
-  
-    const updatedUser = await this.prisma.user.update({
-      where: { id: numericUserId },
-      data: { currentDocument: document },
-    });
-  
-    // Emit the user status update to inform others of the document change
-    this.server.emit('userStatus', {
-      userId: numericUserId,
-      status: updatedUser.status,
-      currentDocument: updatedUser.currentDocument,
-    });
-  
-    console.log('Updated user:', updatedUser);
-    return updatedUser;
-  }
+ 
  async getUserById(id: number) {
     try{
         const userId = Number(id);
@@ -191,6 +149,7 @@ export class UserService {
             throw e;
         }
     }
+
 
     async updateUser(newInfo: FullUserInfo){
         try{
