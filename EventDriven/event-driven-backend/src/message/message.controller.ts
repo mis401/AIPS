@@ -1,43 +1,49 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { MessageEvent } from 'src/events-mq/message-event';
-import { MessageService } from './message.service';
-import { SubscribeMessage } from '@nestjs/websockets';
-import { ChatGateway } from 'src/chat-mq/chat.gateway';
+import { WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, MessageBody } from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { UserService } from "src/user/user.service";
 
-@Controller('message')
-export class MessageController {
-    constructor(
-        private readonly eventEmitter: EventEmitter2,
-        private readonly messageService: MessageService,
-        private readonly chatGateway: ChatGateway,
-    ) {}
+export interface UserStatus {
+    [key: string]: 'online' | 'offline';
+}
 
-    @Post('send')
-    async sendMessage(
-        @Body('communityId') communityId: number,
-        @Body('senderId') senderId: number,
-        @Body('message') message:string
-    ){
-        const newMessage = await this.messageService.createMessages({
-            community: {connect: {id:communityId}},
-            sender:{connect: {id:senderId}},
-            text: message,
-        });
+@WebSocketGateway({
+    cors: {
+        origin: 'http://localhost:3000',
+        credentials: true,
+    },
+})
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+    @WebSocketServer() server: Server;
 
-        console.log("New message: ", newMessage.text);
-        this.eventEmitter.emit(
-            'message.send',
-            new MessageEvent(communityId, senderId, message)
-        );
+    constructor(private readonly userService: UserService) {}
 
-        return newMessage;
+    afterInit(server: Server) {
+        console.log('WebSocket server initialized');
     }
 
-    @Get('messages')
-    async getMessages(@Query('communityId') communityId: number) {
-        return this.messageService.getMessagesByCommunity(Number(communityId));
+    async handleConnection(client: Socket) {
+        const userId = client.handshake.query.userId;
+        if (userId) {
+            await this.userService.updateUserStatus(Number(userId), 'online');
+            this.server.emit('userStatus', { userId, status: 'online' });
+        }
     }
 
+    async handleDisconnect(client: Socket) {
+        const userId = client.handshake.query.userId;
+        if (userId) {
+            await this.userService.updateUserStatus(Number(userId), 'offline');
+            this.server.emit('userStatus', { userId, status: 'offline' });
+        }
+    }
 
+    @SubscribeMessage('send')
+    handleMessage(client: Socket, @MessageBody() message: any): void {
+        this.sendMessage(message);
+    }
+
+    sendMessage(message: any) {
+        this.server.emit('message', message);
+        console.log("Message sent: ", JSON.stringify(message));
+    }
 }
