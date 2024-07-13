@@ -29,7 +29,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
   const [selectedDate, setSelectedDate] = useState<DayObject | null>(null);
   const [documents, setDocuments] = useState<{ [key: string]: { id: number; name: string; type: DocumentType }[] }>({});
   const [openEditor, setOpenEditor] = useState<boolean>(false);
-  const [currentDocument, setCurrentDocument] = useState<{ content: string, type: DocumentType } | null>(null);
+  const [currentDocument, setCurrentDocument] = useState<{ docId: number | null, content: string, type: DocumentType } | null>(null);
 
   const today = new Date();
 
@@ -163,7 +163,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
           data.content = "data:image/png;base64," + data.content
           console.log(data.content);
         }
-        setCurrentDocument({ content: data.content, type: data.type });
+        setCurrentDocument({ docId: data.id, content: data.content, type: data.type });
         setOpenEditor(true);
       } else {
         console.error('Failed to fetch document content');

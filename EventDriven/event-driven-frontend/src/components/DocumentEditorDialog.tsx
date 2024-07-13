@@ -6,16 +6,22 @@ import todoListIcon from '../assets/images/todo-list.png';
 import whiteboardIcon from '../assets/images/whiteboard.png';
 import undoIcon from '../assets/images/undo.png';
 import { DocumentType } from '../dtos/NewDocument';
+import { io } from 'socket.io-client';
+import useAuth from '../hooks/useAuth';
+import { DiffDTO } from '../dtos/diff.dto';
+import { current } from '@reduxjs/toolkit';
+import { FileOwner } from '../dtos/fileowner.dto';
 
 interface DocumentEditorDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: (content: string, type: DocumentType) => void;
+  docId?: number;
   content?: string;
   type?: DocumentType;
 }
 
-const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClose, onSave, content = '', type = DocumentType.DOCUMENT }) => {
+const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClose, onSave, docId, content = '', type = DocumentType.DOCUMENT}) => {
   const [currentContent, setCurrentContent] = useState(content);
   const [docType, setDocType] = useState<DocumentType>(type);
   const [todoItems, setTodoItems] = useState<string[]>([]);
@@ -25,9 +31,15 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   const [lineWidth, setLineWidth] = useState(2);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const historyRef = useRef<ImageData[]>([]);
+  const [previousContent, setPreviousContent] = useState('')
+  const [diff, setDiff] = useState('');
+  //const socket = useRef<any>(io('http://localhost:8000'));
+  const socketFlag = useRef<boolean>(false);
+  const { auth } = useAuth();
+  const userInState = auth?.user;
+  
 
   useEffect(() => {
-    console.log("Content:", content);
     setCurrentContent(content);
     setDocType(type);
     if (type === DocumentType.TODO) {
@@ -57,6 +69,26 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
     }
   }, [docType]);
 
+  // useEffect(() => {
+  //   socket.current = io('http://localhost:8000');
+  //   socket.current.on('connect', () => {
+  //     console.log("Collab socket connected, user "+userInState?.id);
+  //   });
+  //   socket.current.on('diff', (diff: DiffDTO) => {
+  //     console.log(diff);
+  //     setCurrentContent(diff.diff);
+  //   })
+  //   socket.current.on('disconnect', () => {
+  //     console.log("Collab socket left, user ", userInState?.id);
+  //   })
+  //   if (userInState?.id && docId) {
+  //     const fileOwner: FileOwner = {user: userInState!.id, file: docId}
+  //     socket.current.emit('registering', fileOwner);
+  //   }
+  //   setTimeout(() => {socketFlag.current=!socketFlag}, 200);
+  // }, [socketFlag]);
+
+
   const handleSave = () => {
     const formattedContent = docType === DocumentType.TODO ? todoItems.join('\n') : currentContent;
     onSave(formattedContent, docType);
@@ -64,6 +96,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    
     setCurrentContent(e.target.value);
   };
 
