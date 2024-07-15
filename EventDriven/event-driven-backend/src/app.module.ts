@@ -58,7 +58,7 @@ import { RabbitMQService } from './mq/rabbitmq.service';
         name: 'NOTIFICATIONS_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: ['amqp://26.128.205.116:5672'],
           queue: 'notifications_queue',
           queueOptions: {
             durable: true,
@@ -69,7 +69,7 @@ import { RabbitMQService } from './mq/rabbitmq.service';
         name:"MESSAGES_SERVICE",
         transport:Transport.RMQ,
         options: {
-          urls: ['amqp://26.90.10.202:5672'], //kris: 26.90.10.202
+          urls: ['amqp://26.128.205.116:5672'], //kris: 26.90.10.202 //andj 26.128.205.116
           queue: 'messages_queue',
           queueOptions: {
             durable: true,
