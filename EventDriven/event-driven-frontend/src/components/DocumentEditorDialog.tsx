@@ -9,6 +9,7 @@ import { DocumentType } from '../dtos/NewDocument';
 import { io } from 'socket.io-client';
 import useAuth from '../hooks/useAuth';
 import { DiffDTO } from '../dtos/diff.dto';
+import { SocketDiffDTO } from '../dtos/socket-diff.dto';
 
 interface DocumentEditorDialogProps {
   open: boolean;
@@ -19,7 +20,7 @@ interface DocumentEditorDialogProps {
   type?: DocumentType;
 }
 
-const socket = io('http://localhost:8000');
+const socket = io('http://localhost:8000', {autoConnect: false});
 
 const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   open,
@@ -41,23 +42,42 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   const { auth } = useAuth();
   const userInState = auth?.user;
 
+
   useEffect(() => {
-    socket.on('document_change', (data) => {
-      if (data.docId === docId) {
-        setCurrentContent(data.content);
+    console.log(socket.connected)
+    console.log(docId)
+    if(socket.connected || !docId)
+      return;
+    socket.connect();
+    socket.emit(`register`, docId)
+    socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
+      if (data.id === docId) {
+        if (docType == DocumentType.DOCUMENT || docType == DocumentType.TODO){
+          setCurrentContent(currentContent+data.diff);
+        }
+        else if (docType == DocumentType.WHITEBOARD){
+          const canvas = canvasRef.current;
+          if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
+              ctx.stroke();
+            }
+          }
+        }
       }
     });
-
-    return () => {
-      socket.off('document_change');
-    };
-  }, [docId]);
+  });
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const oldContent = currentContent;
     const newContent = e.target.value;
+    const diff = newContent.replace(oldContent, '');
     setCurrentContent(newContent);
     console.log(newContent);
-    socket.emit('document_change', { docId, content: newContent });
+    console.log(diff);
+    socket.emit(`document_change`, { id: docId, diff: diff, mouseData: null, type: docType });
   };
 
   const handleSave = () => {
@@ -65,8 +85,8 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     const diffDto: DiffDTO = {
       path: '', 
       type: docType,
-      diff: formattedContent,
-      docId: docId || 0,
+      content: formattedContent,
+      id: docId || 0,
       user: userInState?.id || 0,
     };
     onSave(diffDto); 
@@ -93,7 +113,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
           ctx.fillRect(0, 0, canvas.width, canvas.height);
         } else {
           const img = new Image();
-          img.src = content;
+          img.src = currentContent;
           img.onload = () => {
             ctx.drawImage(img, 0, 0);
           };
@@ -163,9 +183,10 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.closePath();
+        //ctx.closePath();
         setIsDrawing(false);
-        setCurrentContent(canvas.toDataURL());
+        const dataURL = canvas.toDataURL();
+        setCurrentContent(dataURL);
       }
     }
   };
@@ -195,8 +216,11 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     }
   };
 
-  if (!open) return null;
-
+  if (!open) {
+    socket.emit(`unregister`, docId);
+    socket.disconnect(); 
+    return null;
+  }
   return (
     <div className="document-editor-dialog">
       <div className="dialog-content">

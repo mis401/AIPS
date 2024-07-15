@@ -4,6 +4,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FilesysService } from 'src/filesys/filesys.service';
 import { DiffDTO } from '../dtos/diff.dto';
+import { DocumentUpdate } from 'src/dtos/document-update.dto';
 
 @Injectable()
 export class DocService {
@@ -146,10 +147,10 @@ export class DocService {
         }
     }
 
-    async updateDocument(diffDto: DiffDTO) {
+    async updateDocument(newDoc: DocumentUpdate) {
         try {
           const doc = await this.prisma.document.findUnique({
-            where: { id: diffDto.docId },
+            where: { id: newDoc.id },
           });
     
           if (!doc) {
@@ -157,7 +158,7 @@ export class DocService {
           }
     
           // Update the document content in the file system
-          await this.filesys.saveDocumentContent(doc.path, diffDto.diff);
+          await this.filesys.saveDocumentContent(doc.path, newDoc.content);
     
           return { message: 'Document updated successfully' };
         } catch (error) {

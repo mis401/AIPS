@@ -35,7 +35,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
 
   const handleSaveDocument = async (diffDto: DiffDTO) => {
     console.log(diffDto);
-    if (diffDto.docId) {
+    if (diffDto.id) {
       // Update existing document
       try {
         const response = await fetch('http://localhost:8000/doc/update', {
@@ -43,7 +43,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(diffDto),
+          body: JSON.stringify(diffDto.id, diffDto.content),
         });
         if (response.ok) {
           console.log('Document updated successfully');
@@ -56,7 +56,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
     } else {
       // Create new document
       setOpenAddDialog(true);
-      setCurrentDocument({ ...currentDocument, content: diffDto.diff, type: diffDto.type });
+      setCurrentDocument({ ...currentDocument, content: diffDto.content, type: diffDto.type });
     }
   };
 
@@ -144,6 +144,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
       <DocumentEditorDialog
         open={openEditor}
         onClose={() => {
+          setCurrentDocument({id:undefined, content:'', type:DocumentType.DOCUMENT});
           setOpenEditor(false);
         }}
         onSave={handleSaveDocument}

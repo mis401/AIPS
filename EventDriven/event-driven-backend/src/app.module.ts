@@ -23,6 +23,7 @@ import { ChatModule } from './chat-mq/chat.module';
 import { DocumentGateway } from './mq/doc.gateway';
 import { RabbitMQService } from './mq/rabbitmq.service';
 
+
 @Module({
 
   controllers: [AppController],
@@ -68,7 +69,7 @@ import { RabbitMQService } from './mq/rabbitmq.service';
         name:"MESSAGES_SERVICE",
         transport:Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'], //kris: 26.90.10.202
+          urls: ['amqp://26.90.10.202:5672'], //kris: 26.90.10.202
           queue: 'messages_queue',
           queueOptions: {
             durable: true,

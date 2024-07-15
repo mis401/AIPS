@@ -13,7 +13,7 @@ export class RabbitMQService implements OnModuleInit {
 
   private async connect() {
     try {
-      this.connection = await amqp.connect('amqp://localhost');
+      this.connection = await amqp.connect('amqp://26.90.10.202:5672');
       this.channel = await this.connection.createChannel();
     } catch (error) {
       console.error('Failed to connect to RabbitMQ', error);
@@ -23,8 +23,10 @@ export class RabbitMQService implements OnModuleInit {
 
   public async sendToQueue(queue: string, message: string) {
     try {
+      if (this.channel) {
       await this.channel.assertQueue(queue);
       this.channel.sendToQueue(queue, Buffer.from(message));
+      }
     } catch (error) {
       console.error('Failed to send message to queue', error);
     }
@@ -32,8 +34,10 @@ export class RabbitMQService implements OnModuleInit {
 
   public async consume(queue: string, callback: (msg: amqp.Message) => void) {
     try {
-      await this.channel.assertQueue(queue);
-      this.channel.consume(queue, callback, { noAck: true });
+      if (this.channel) {
+        await this.channel.assertQueue(queue);
+        this.channel.consume(queue, callback, { noAck: true });
+      }
     } catch (error) {
       console.error('Failed to consume messages from queue', error);
     }

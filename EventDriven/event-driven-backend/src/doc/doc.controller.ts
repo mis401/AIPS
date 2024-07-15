@@ -5,6 +5,7 @@ import { FullDocument } from 'src/dtos/document.interface';
 import { info } from 'console';
 import { UserService } from 'src/user/user.service';
 import { DiffDTO } from '../dtos/diff.dto';
+import { DocumentUpdate } from 'src/dtos/document-update.dto';
 
 
 
@@ -53,8 +54,14 @@ export class DocController {
         return await this.DocService.createDocument(document);
     }
 
+    // @Put('update')
+    // async updateDocument(@Body() diffDto: DiffDTO) {
+    //   return await this.DocService.updateDocument(diffDto);
+    // }
     @Put('update')
-    async updateDocument(@Body() diffDto: DiffDTO) {
-      return await this.DocService.updateDocument(diffDto);
+    async updateDocument(@Body() newContent: DocumentUpdate) {
+      return await this.DocService.updateDocument(newContent);
     }
+
+    
 }

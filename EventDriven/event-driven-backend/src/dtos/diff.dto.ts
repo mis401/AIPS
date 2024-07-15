@@ -3,7 +3,7 @@ import { DocumentType } from "@prisma/client";
 export interface DiffDTO {
     path: string;
     type: DocumentType;
-    diff: any;
-    docId: number;
+    content: any;
+    id: number;
     user: number;
 }

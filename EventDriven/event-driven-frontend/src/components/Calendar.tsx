@@ -4,6 +4,7 @@ import "../styles/Calendar.css";
 import { DocumentType, NewDocumentDTO } from '../dtos/NewDocument';
 import DocumentEditorDialog from "./DocumentEditorDialog";
 import { FullDocument } from "../dtos/full-document.interface";
+import { DiffDTO } from "../dtos/diff.dto";
 
 export interface DayObject {
   day: number;
@@ -132,6 +133,37 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
     return weeks;
   };
 
+  const handleUpdateDocument = async (diffDto: DiffDTO) => {
+    console.log(currentDocument);
+    if (currentDocument!.docId) {
+      // Update existing document
+      try {
+        const data = {
+          id: currentDocument!.docId,
+          content: diffDto.content
+        }
+        const response = await fetch('http://localhost:8000/doc/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        if (response.ok) {
+          console.log('Document updated successfully');
+        } else {
+          console.error('Failed to update the document');
+        }
+      } catch (error) {
+        console.error('Error updating the document:', error);
+      }
+    } else {
+      // Create new document
+      console.error("Error on handling document update");
+      //setCurrentDocument({ ...currentDocument, docId: diffDto.id, content: diffDto.content, type: diffDto.type });
+    }
+  };
+
   const handleDateClick = (day: DayObject) => {
     setSelectedDate(day);
     console.log(day);
@@ -161,7 +193,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
         const data: FullDocument = await response.json();
         if (data.type === DocumentType.WHITEBOARD){
           data.content = "data:image/png;base64," + data.content
-          console.log(data.content);
+          //console.log(data.content);
         }
         setCurrentDocument({ docId: data.id, content: data.content, type: data.type });
         setOpenEditor(true);
@@ -214,10 +246,11 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
       {currentDocument && (
         <DocumentEditorDialog
           open={openEditor}
-          onClose={() => setOpenEditor(false)}
-          onSave={() => {}}
+          onClose={() => {setCurrentDocument({docId:null, content:'', type:DocumentType.DOCUMENT}); setOpenEditor(false)}}
+          onSave={handleUpdateDocument}
           content={currentDocument.content}
           type={currentDocument.type}
+          docId={currentDocument.docId!}
         />
       )}
     </div>
