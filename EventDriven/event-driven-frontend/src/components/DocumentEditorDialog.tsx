@@ -46,29 +46,32 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     if (docId) {
       socket.connect();
       socket.emit('register', docId);
-      socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
-        if (data.id === docId) {
-          if (docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) {
-            console.log(data.diff);
-            setCurrentContent(prevContent => prevContent + data.diff);
-          } else if (docType === DocumentType.WHITEBOARD) {
-            const canvas = canvasRef.current;
-            if (canvas) {
-              const rect = canvas.getBoundingClientRect();
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
-                ctx.stroke();
+      if (!socket.hasListeners(`document_changed ${docId}`)) {
+        socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
+          if (data.id === docId) {
+            if (docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) {
+              console.log(data);
+              setCurrentContent(prevContent => prevContent + data.diff);
+            } else if (docType === DocumentType.WHITEBOARD) {
+              const canvas = canvasRef.current;
+              if (canvas) {
+                const rect = canvas.getBoundingClientRect();
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
+                  ctx.stroke();
+                }
               }
             }
           }
-        }
-      });
+        });
+      }
     }
 
     return () => {
       if (docId) {
         socket.emit('unregister', docId);
+        socket.offAny();
         socket.disconnect();
       }
     };
@@ -222,8 +225,8 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   };
 
   const handleClose = () => {
-    socket.emit(`unregister`, docId);
     socket.disconnect();
+    socket.offAny();
     console.log(docId);
     onClose();
   }

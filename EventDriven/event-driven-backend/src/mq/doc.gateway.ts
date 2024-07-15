@@ -6,6 +6,8 @@ import {
     MessageBody,
     ConnectedSocket,
     OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
   import { RabbitMQService } from './rabbitmq.service';
@@ -17,7 +19,7 @@ import { SocketDiffDTO } from 'src/dtos/socket-diff.dto';
     origin: ['http://localhost:3000'],
     credentials: true,
   },})
-  export class DocumentGateway implements OnGatewayInit, OnModuleInit {
+  export class DocumentGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleInit {
     @WebSocketServer()
     server: Server;
   
@@ -38,8 +40,10 @@ import { SocketDiffDTO } from 'src/dtos/socket-diff.dto';
       console.log("Client connected for documents");
     }
 
-    handleDisconnect(@ConnectedSocket() client: Socket) {
+    async handleDisconnect(@ConnectedSocket() client: Socket) {
       console.log("Client disconnected for documents");
+      const sockets = await this.server.fetchSockets();
+      sockets.forEach(s => console.log(s.rooms));
     }
 
     @SubscribeMessage(`register`)
@@ -47,22 +51,25 @@ import { SocketDiffDTO } from 'src/dtos/socket-diff.dto';
       client.join(id.toString());
       
       console.log("Client joined room for doc id "+id);
+      console.log((await this.server.in(id.toString()).fetchSockets()).length);
     }
 
     @SubscribeMessage(`unregister`)
     async handleUnregister(@ConnectedSocket() client: Socket, @MessageBody() id: number){
       client.leave(id.toString());
       console.log("Client unregistered from doc id "+id);
+      console.log((await this.server.in(id.toString()).fetchSockets()).length);
     }
 
     @SubscribeMessage(`document_change`)
-    async handleDocumentChange(
+    handleDocumentChange(
       @MessageBody() data: SocketDiffDTO,
       @ConnectedSocket() client: Socket,
     ) {
       console.log(data);
       this.rabbitMQService.sendToQueue('document_changes', JSON.stringify(data));
-      client.broadcast.in(data.id.toString()).emit(`document_changed ${data.id}`, data);
+      client.broadcast.to(data.id.toString()).emit(`document_changed ${data.id}`, data);
+      console.log(client.rooms);
     }
   }
   
