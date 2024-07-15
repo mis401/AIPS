@@ -37,10 +37,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-   
-
-    sendMessage(message: any) {
+    @SubscribeMessage('send_message')
+    async handleMessage(client: Socket, payload: any): Promise<void> {
+        const user = await this.userService.getUserById(payload.senderId);
+        const message = {
+            ...payload,
+            senderName: `${user.firstName} ${user.lastName}`
+        };
         this.server.emit('message', message);
         console.log("Message sent: ", JSON.stringify(message));
+    }
+    
+
+    async sendMessage(message: any) {
+        const user = await this.userService.getUserById(message.senderId);
+        const mess = {
+            ...message,
+            senderName: `${user.firstName} ${user.lastName}`
+        };
+        this.server.emit('message', mess);
+        console.log("Message sent2: ", JSON.stringify(message));
     }
 }
