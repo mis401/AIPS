@@ -19,11 +19,12 @@ export class ChatListenerService {
             communityId: event.communityId,
             senderId: event.senderId,
             content: event.message,
+            name: event.senderName,
         };
 
         console.log("Message", message.content);
 
-        //this.client.emit('message', message);
-        //this.chatGateway.sendMessage(message);
+        this.client.emit('message', message);
+       // this.chatGateway.sendMessage(message);
     }
 }
