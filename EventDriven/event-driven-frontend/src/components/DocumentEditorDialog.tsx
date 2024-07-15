@@ -49,6 +49,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
         if (data.id === docId) {
           if (docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) {
+            console.log(data.diff);
             setCurrentContent(prevContent => prevContent + data.diff);
           } else if (docType === DocumentType.WHITEBOARD) {
             const canvas = canvasRef.current;
