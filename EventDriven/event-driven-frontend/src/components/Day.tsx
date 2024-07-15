@@ -5,6 +5,7 @@ import DocumentEditorDialog from './DocumentEditorDialog';
 import useAuth from '../hooks/useAuth';
 import DayAddDialog from './DayAddDialog';
 import { DocumentType, NewDocumentDTO } from '../dtos/NewDocument';
+import { DiffDTO } from '../dtos/diff.dto';
 
 interface DayProps {
   day: DayObject;
@@ -12,13 +13,13 @@ interface DayProps {
   isCurrentDay: boolean;
   onDateClick: (day: DayObject) => void;
   communityId: number;
-  onDocumentClick: (documentId: number, documentName: string) => void;
+  onDocumentClick: (documentId: number) => void;
 }
 
 const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, communityId, onDocumentClick }) => {
   const [openEditor, setOpenEditor] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [currentDocument, setCurrentDocument] = useState<{ content: string, type: DocumentType } | null>(null);
+  const [currentDocument, setCurrentDocument] = useState<{ id?: number; content: string; type: DocumentType } | null>(null);
   
   const { auth } = useAuth();
   const userInState = auth?.user;
@@ -27,9 +28,36 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
     onDateClick(day);
   };
   
-  const handleSaveDocument = async (content: string, type: DocumentType) => {
-    setOpenAddDialog(true);
-    setCurrentDocument({ content, type });
+  // const handleSaveDocument = async (content: string, type: DocumentType) => {
+  //   setOpenAddDialog(true);
+  //   setCurrentDocument({ content, type });
+  // };
+
+  const handleSaveDocument = async (diffDto: DiffDTO) => {
+    console.log(diffDto);
+    if (diffDto.id) {
+      // Update existing document
+      try {
+        const response = await fetch('http://localhost:8000/doc/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(diffDto.id, diffDto.content),
+        });
+        if (response.ok) {
+          console.log('Document updated successfully');
+        } else {
+          console.error('Failed to update the document');
+        }
+      } catch (error) {
+        console.error('Error updating the document:', error);
+      }
+    } else {
+      // Create new document
+      setOpenAddDialog(true);
+      setCurrentDocument({ ...currentDocument, content: diffDto.content, type: diffDto.type });
+    }
   };
 
   const handleCreateDocument = (documentName: string) => {
@@ -102,7 +130,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         </label>
         <div className="documents">
           {day.documents?.map((doc) => (
-            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id, doc.name);}}>
+            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id);}}>
               {doc.name}
             </div>
           ))}
@@ -116,6 +144,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
       <DocumentEditorDialog
         open={openEditor}
         onClose={() => {
+          
           setOpenEditor(false);
         }}
         onSave={handleSaveDocument}

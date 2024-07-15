@@ -14,12 +14,15 @@ import { CommunityService } from './community/community.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NotificationsGateway } from './notification/notification.gateway';
 import { DocService } from './doc/doc.service';
-import { CollaborationGateway } from './socket/collaboration.gateway';
+// import { CollaborationGateway } from './socket/collaboration.gateway';
 import { ChatListenerService } from './chat-mq/chat.listener.service';
 import { ChatGateway } from './chat-mq/chat.gateway';
 import { MessageService } from './message/message.service';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat-mq/chat.module';
+import { DocumentGateway } from './mq/doc.gateway';
+import { RabbitMQService } from './mq/rabbitmq.service';
+
 
 @Module({
 
@@ -32,7 +35,9 @@ import { ChatModule } from './chat-mq/chat.module';
     NotificationsListenerService,
     NotificationsGateway,
     DocService,
-    CollaborationGateway,
+    // CollaborationGateway,
+    DocumentGateway,
+    RabbitMQService,
     ChatListenerService,
     ChatGateway,
     MessageService,
@@ -53,7 +58,7 @@ import { ChatModule } from './chat-mq/chat.module';
         name: 'NOTIFICATIONS_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://26.128.205.116:5672'],
+          urls: ['amqp://localhost:5672'],
           queue: 'notifications_queue',
           queueOptions: {
             durable: true,
@@ -64,7 +69,7 @@ import { ChatModule } from './chat-mq/chat.module';
         name:"MESSAGES_SERVICE",
         transport:Transport.RMQ,
         options: {
-          urls: ['amqp://26.128.205.116:5672'],
+          urls: ['amqp://26.90.10.202:5672'], //kris: 26.90.10.202
           queue: 'messages_queue',
           queueOptions: {
             durable: true,

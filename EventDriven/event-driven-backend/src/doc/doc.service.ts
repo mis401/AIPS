@@ -3,6 +3,8 @@ import { Community, DocumentType } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FilesysService } from 'src/filesys/filesys.service';
+import { DiffDTO } from '../dtos/diff.dto';
+import { DocumentUpdate } from 'src/dtos/document-update.dto';
 
 @Injectable()
 export class DocService {
@@ -144,4 +146,23 @@ export class DocService {
             throw e;
         }
     }
+
+    async updateDocument(newDoc: DocumentUpdate) {
+        try {
+          const doc = await this.prisma.document.findUnique({
+            where: { id: newDoc.id },
+          });
+    
+          if (!doc) {
+            throw new NotFoundException('Document not found');
+          }
+    
+          // Update the document content in the file system
+          await this.filesys.saveDocumentContent(doc.path, newDoc.content);
+    
+          return { message: 'Document updated successfully' };
+        } catch (error) {
+          throw new InternalServerErrorException(error.message);
+        }
+      }
 }

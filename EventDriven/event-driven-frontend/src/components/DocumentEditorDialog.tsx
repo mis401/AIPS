@@ -6,16 +6,30 @@ import todoListIcon from '../assets/images/todo-list.png';
 import whiteboardIcon from '../assets/images/whiteboard.png';
 import undoIcon from '../assets/images/undo.png';
 import { DocumentType } from '../dtos/NewDocument';
+import { io } from 'socket.io-client';
+import useAuth from '../hooks/useAuth';
+import { DiffDTO } from '../dtos/diff.dto';
+import { SocketDiffDTO } from '../dtos/socket-diff.dto';
 
 interface DocumentEditorDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (content: string, type: DocumentType) => void;
+  onSave: (diffDto: DiffDTO) => void;
+  docId?: number;
   content?: string;
   type?: DocumentType;
 }
 
-const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClose, onSave, content = '', type = DocumentType.DOCUMENT }) => {
+const socket = io('http://localhost:8000', {autoConnect: false});
+
+const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
+  open,
+  onClose,
+  onSave,
+  docId,
+  content = '',
+  type = DocumentType.DOCUMENT,
+}) => {
   const [currentContent, setCurrentContent] = useState(content);
   const [docType, setDocType] = useState<DocumentType>(type);
   const [todoItems, setTodoItems] = useState<string[]>([]);
@@ -25,9 +39,64 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
   const [lineWidth, setLineWidth] = useState(2);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const historyRef = useRef<ImageData[]>([]);
+  const { auth } = useAuth();
+  const userInState = auth?.user;
+
 
   useEffect(() => {
-    console.log("Content:", content);
+    
+    console.log(socket.connected)
+    console.log(docId)
+    if(socket.connected || !docId)
+      return;
+    socket.connect();
+    socket.emit(`register`, docId)
+    socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
+      if (data.id === docId) {
+        if (docType == DocumentType.DOCUMENT || docType == DocumentType.TODO){
+          console.log(currentContent + data.diff)
+          setCurrentContent(currentContent.concat(data.diff!));
+        }
+        else if (docType == DocumentType.WHITEBOARD){
+          const canvas = canvasRef.current;
+          console.log(data);
+          if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+    });
+  }, [docId]);
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const oldContent = currentContent;
+    const newContent = e.target.value;
+    const diff = newContent.replace(oldContent, '');
+    console.log(newContent);
+    console.log(diff);
+    socket.emit(`document_change`, { id: docId, diff: diff, mouseData: null, type: docType });
+    setCurrentContent(newContent);
+  };
+
+  const handleSave = () => {
+    const formattedContent = docType === DocumentType.TODO ? todoItems.join('\n') : currentContent;
+    const diffDto: DiffDTO = {
+      path: '', 
+      type: docType,
+      content: formattedContent,
+      id: docId || 0,
+      user: userInState?.id || 0,
+    };
+    onSave(diffDto); 
+    onClose();
+  };
+
+  useEffect(() => {
     setCurrentContent(content);
     setDocType(type);
     if (type === DocumentType.TODO) {
@@ -35,7 +104,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
     } else {
       setTodoItems([]);
     }
-  }, [open, content, type]);
+  }, [docId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,33 +112,18 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
       const ctx = canvas.getContext('2d');
       if (ctx) {
         if (!currentContent) {
-          ctx.fillStyle='white';
+          ctx.fillStyle = 'white';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        else {
+        } else {
           const img = new Image();
-          img.src = content;
+          img.src = currentContent;
           img.onload = () => {
             ctx.drawImage(img, 0, 0);
-          }
+          };
         }
       }
     }
-  }, [docType]);
-
-  const handleSave = () => {
-    const formattedContent = docType === DocumentType.TODO ? todoItems.join('\n') : currentContent;
-    onSave(formattedContent, docType);
-    onClose();
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCurrentContent(e.target.value);
-  };
-
-  const handleTodoContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTodoItems(e.target.value.split('\n'));
-  };
+  }, [docType, content, currentContent]);
 
   const handleAddTodoItem = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Enter') {
@@ -123,6 +177,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
       if (ctx) {
         ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
         ctx.stroke();
+        socket.emit(`document_change`, {id: docId, diff: null, mouseData: {x:e.clientX, y: e.clientY}, type: docType})
       }
     }
   };
@@ -132,10 +187,10 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.closePath();
+        //ctx.closePath();
         setIsDrawing(false);
-        console.log("canvas url: ", canvas.toDataURL());
-        setCurrentContent(canvas.toDataURL());
+        const dataURL = canvas.toDataURL();
+        setCurrentContent(dataURL);
       }
     }
   };
@@ -165,8 +220,17 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
     }
   };
 
-  if (!open) return null;
+  const handleClose = () => {
+    socket.emit(`unregister`, docId);
+    socket.disconnect();
+    console.log(docId);
+    onClose();
+  }
 
+  if (!open) {
+    //socket.emit(`unregister`, docId);
+    return null;
+  }
   return (
     <div className="document-editor-dialog">
       <div className="dialog-content">
@@ -255,13 +319,13 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({ open, onClo
                 </div>
                 <button onClick={handleUndo} className={`undo-button ${historyRef.current.length === 0 ? 'inactive' : ''}`}>
                   <img src={undoIcon} alt="Undo" />
-                </button> 
+                </button>
               </div>
             </div>
           )}
         </div>
         <div className="dialog-footer">
-          <button onClick={onClose}>Cancel</button>
+          <button onClick={handleClose}>Cancel</button>
           <button onClick={handleSave}>Save</button>
         </div>
       </div>

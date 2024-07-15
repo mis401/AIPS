@@ -1,9 +1,11 @@
-import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Post, Query, Req, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Post, Put, Query, Req, ValidationPipe } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FullDocument } from 'src/dtos/document.interface';
 import { info } from 'console';
 import { UserService } from 'src/user/user.service';
+import { DiffDTO } from '../dtos/diff.dto';
+import { DocumentUpdate } from 'src/dtos/document-update.dto';
 
 
 
@@ -52,4 +54,14 @@ export class DocController {
         return await this.DocService.createDocument(document);
     }
 
+    // @Put('update')
+    // async updateDocument(@Body() diffDto: DiffDTO) {
+    //   return await this.DocService.updateDocument(diffDto);
+    // }
+    @Put('update')
+    async updateDocument(@Body() newContent: DocumentUpdate) {
+      return await this.DocService.updateDocument(newContent);
+    }
+
+    
 }
