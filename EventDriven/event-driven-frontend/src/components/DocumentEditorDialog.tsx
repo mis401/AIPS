@@ -59,6 +59,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
         }
         else if (docType == DocumentType.WHITEBOARD){
           const canvas = canvasRef.current;
+          console.log(data);
           if (canvas) {
             const rect = canvas.getBoundingClientRect();
             const ctx = canvas.getContext('2d');
@@ -70,7 +71,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
         }
       }
     });
-  });
+  }, [docId]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const oldContent = currentContent;
@@ -103,7 +104,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     } else {
       setTodoItems([]);
     }
-  });
+  }, [docId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -176,6 +177,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       if (ctx) {
         ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
         ctx.stroke();
+        socket.emit(`document_change`, {id: docId, diff: null, mouseData: {x:e.clientX, y: e.clientY}, type: docType})
       }
     }
   };
@@ -219,8 +221,9 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   };
 
   const handleClose = () => {
-    socket.emit(`unregister`, {docId});
+    socket.emit(`unregister`, docId);
     socket.disconnect();
+    console.log(docId);
     onClose();
   }
 
