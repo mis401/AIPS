@@ -80,7 +80,7 @@ import { RabbitMQService } from './mq/rabbitmq.service';
         name:"COLLAB_SERVICE",
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://26.128.205.116:5672'],
+          urls: ['amqp://localhost:5672'], //26.128.205.116
           queue: 'collab_queue',
           queueOptions:{
             durable: true

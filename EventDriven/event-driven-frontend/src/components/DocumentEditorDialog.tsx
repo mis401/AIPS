@@ -42,36 +42,36 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   const { auth } = useAuth();
   const userInState = auth?.user;
 
-
   useEffect(() => {
-    
-    console.log(socket.connected)
-    console.log(docId)
-    if(socket.connected || !docId)
-      return;
-    socket.connect();
-    socket.emit(`register`, docId)
-    socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
-      if (data.id === docId) {
-        if (docType == DocumentType.DOCUMENT || docType == DocumentType.TODO){
-          console.log(currentContent + data.diff)
-          setCurrentContent(currentContent.concat(data.diff!));
-        }
-        else if (docType == DocumentType.WHITEBOARD){
-          const canvas = canvasRef.current;
-          console.log(data);
-          if (canvas) {
-            const rect = canvas.getBoundingClientRect();
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
-              ctx.stroke();
+    if (docId) {
+      socket.connect();
+      socket.emit('register', docId);
+      socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
+        if (data.id === docId) {
+          if (docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) {
+            setCurrentContent(prevContent => prevContent + data.diff);
+          } else if (docType === DocumentType.WHITEBOARD) {
+            const canvas = canvasRef.current;
+            if (canvas) {
+              const rect = canvas.getBoundingClientRect();
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
+                ctx.stroke();
+              }
             }
           }
         }
+      });
+    }
+
+    return () => {
+      if (docId) {
+        socket.emit('unregister', docId);
+        socket.disconnect();
       }
-    });
-  }, [docId]);
+    };
+  }, [docId, docType]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const oldContent = currentContent;
