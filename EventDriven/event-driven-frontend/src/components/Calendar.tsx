@@ -41,6 +41,11 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
   }, []);
 
   useEffect(() => {
+    console.log(currentDocument);
+  })
+
+  useEffect(() => {
+    
     fetchDocumentsForMonth(communityId, month + 1, year);
   }, [month, year, communityId]);
 
@@ -196,6 +201,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
           //console.log(data.content);
         }
         setCurrentDocument({ docId: data.id, content: data.content, type: data.type });
+        console.log(currentDocument);
         setOpenEditor(true);
       } else {
         console.error('Failed to fetch document content');
@@ -246,7 +252,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
       {currentDocument && (
         <DocumentEditorDialog
           open={openEditor}
-          onClose={() => {setCurrentDocument({docId:null, content:'', type:DocumentType.DOCUMENT}); setOpenEditor(false)}}
+          onClose={() => {setOpenEditor(false)}}
           onSave={handleUpdateDocument}
           content={currentDocument.content}
           type={currentDocument.type}

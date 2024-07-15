@@ -13,7 +13,7 @@ interface DayProps {
   isCurrentDay: boolean;
   onDateClick: (day: DayObject) => void;
   communityId: number;
-  onDocumentClick: (documentId: number, documentName: string) => void;
+  onDocumentClick: (documentId: number) => void;
 }
 
 const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, communityId, onDocumentClick }) => {
@@ -130,7 +130,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         </label>
         <div className="documents">
           {day.documents?.map((doc) => (
-            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id, doc.name);}}>
+            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id);}}>
               {doc.name}
             </div>
           ))}
@@ -144,7 +144,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
       <DocumentEditorDialog
         open={openEditor}
         onClose={() => {
-          setCurrentDocument({id:undefined, content:'', type:DocumentType.DOCUMENT});
+          
           setOpenEditor(false);
         }}
         onSave={handleSaveDocument}

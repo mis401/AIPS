@@ -45,6 +45,7 @@ import { SocketDiffDTO } from 'src/dtos/socket-diff.dto';
     @SubscribeMessage(`register`)
     async handleRegistering(@ConnectedSocket() client: Socket, @MessageBody() id: number){
       client.join(id.toString());
+      
       console.log("Client joined room for doc id "+id);
     }
 

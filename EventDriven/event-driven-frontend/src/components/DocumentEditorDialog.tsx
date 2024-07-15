@@ -44,6 +44,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
 
 
   useEffect(() => {
+    
     console.log(socket.connected)
     console.log(docId)
     if(socket.connected || !docId)
@@ -53,7 +54,8 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
       if (data.id === docId) {
         if (docType == DocumentType.DOCUMENT || docType == DocumentType.TODO){
-          setCurrentContent(currentContent+data.diff);
+          console.log(currentContent + data.diff)
+          setCurrentContent(currentContent.concat(data.diff!));
         }
         else if (docType == DocumentType.WHITEBOARD){
           const canvas = canvasRef.current;
@@ -74,10 +76,10 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     const oldContent = currentContent;
     const newContent = e.target.value;
     const diff = newContent.replace(oldContent, '');
-    setCurrentContent(newContent);
     console.log(newContent);
     console.log(diff);
     socket.emit(`document_change`, { id: docId, diff: diff, mouseData: null, type: docType });
+    setCurrentContent(newContent);
   };
 
   const handleSave = () => {
@@ -101,7 +103,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     } else {
       setTodoItems([]);
     }
-  }, [open, content, type]);
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -216,9 +218,14 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     }
   };
 
+  const handleClose = () => {
+    socket.emit(`unregister`, {docId});
+    socket.disconnect();
+    onClose();
+  }
+
   if (!open) {
-    socket.emit(`unregister`, docId);
-    socket.disconnect(); 
+    //socket.emit(`unregister`, docId);
     return null;
   }
   return (
@@ -315,7 +322,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
           )}
         </div>
         <div className="dialog-footer">
-          <button onClick={onClose}>Cancel</button>
+          <button onClick={handleClose}>Cancel</button>
           <button onClick={handleSave}>Save</button>
         </div>
       </div>
