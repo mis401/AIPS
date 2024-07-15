@@ -20,8 +20,8 @@ export class MessageController {
         @Body('message') message:string
     ){
         const newMessage = await this.messageService.createMessages({
-            community: {connect: {id:communityId}},
-            sender:{connect: {id:senderId}},
+            community: { connect: { id: communityId }},
+            sender: { connect: { id: senderId }},
             text: message,
         });
 
@@ -38,6 +38,4 @@ export class MessageController {
     async getMessages(@Query('communityId') communityId: number) {
         return this.messageService.getMessagesByCommunity(Number(communityId));
     }
-
-  
 }

@@ -8,7 +8,7 @@ interface Member {
     firstName: string;
     lastName: string;
     email: string;
-    status: 'online' | 'offline'; // Dodato polje za status
+    status: 'online' | 'offline';
 }
 
 interface Message {
@@ -40,7 +40,7 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                     method: 'GET',
                     credentials: 'include',
                 });
-    
+
                 if (response.ok) {
                     const data = await response.json();
                     setMembers(data);
@@ -53,14 +53,14 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 console.error('Fetch error:', error);
             }
         };
-    
+
         const fetchMessages = async () => {
             try {
                 const response = await fetch(`http://localhost:8000/message/messages?communityId=${communityId}`, {
                     method: 'GET',
                     credentials: 'include',
                 });
-    
+
                 if (response.ok) {
                     const data = await response.json();
                     setMessages(data.map((msg: any) => ({
@@ -77,76 +77,58 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 console.error('Fetch error:', error);
             }
         };
-    
+
         fetchMembers();
         fetchMessages();
-    
+
         if (userInState?.id) {
             socket.current = io('http://localhost:8000', {
                 query: { userId: userInState.id.toString() }
             });
-    
+
             socket.current.on('connect', () => {
                 console.log('Socket.io connection established for chat');
             });
-    
+
             socket.current.on('message', (message: Message) => {
+                console.log("Usla sam u on")
                 setMessages((prevMessages) => [...prevMessages, message]);
             });
-    
+
             socket.current.on('userStatus', async ({ userId, status }: { userId: string, status: 'online' | 'offline' }) => {
                 console.log(`User status update: ${userId} is now ${status}`);
-                // Osveži članove povlačenjem iz baze
                 await fetchMembers();
             });
-    
+
             return () => {
                 if (socket.current) {
+                    socket.current.off('message');
                     socket.current.disconnect();
                 }
             };
         }
     }, [communityId, userInState]);
-    
+
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
-    
-    const handleSendMessage = async () => {
+
+    const sendMessage = () => {
+        console.log("Usla sam u poruku")
         if (newMessage.trim() !== '') {
-            const message = {
+            const messageData = {
                 communityId,
                 senderId: userInState?.id,
-                message: newMessage,
+                content: newMessage,
+                senderName: `${userInState?.firstName} ${userInState?.lastName}`,
             };
-    
-            try {
-                const response = await fetch('http://localhost:8000/message/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(message),
-                    credentials: 'include',
-                });
-    
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Message saved:', data);
-                } else {
-                    const errorData = await response.json();
-                    console.error('Send message failed:', errorData.message);
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-    
+            socket.current.emit('send_message', messageData);
             setNewMessage('');
         }
     };
-    
+
     return (
         <div className={`chat-sidebar ${isChatSidebarOpen ? '' : 'closed'}`}>
             <div className="chat-sidebar-header">
@@ -154,7 +136,7 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                     <h1>Chats</h1>
                 </div>
             </div>
-    
+
             <div className="chat-sidebar-chats">
                 {members.map((member) => (
                     <div key={member.id} className="chat-sidebar-chat">
@@ -170,7 +152,7 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                     </div>
                 ))}
             </div>
-    
+
             <div className="chat-sidebar-messages">
                 {messages.map((message, index) => (
                     <div key={index} className={`chat-message ${message.senderId === userInState?.id ? 'my-message' : 'other-message'}`}>
@@ -180,15 +162,15 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 ))}
                 <div ref={messagesEndRef} />
             </div>
-    
+
             <div className="chat-sidebar-footer">
-                <input 
-                    type="text" 
-                    value={newMessage} 
-                    onChange={(e) => setNewMessage(e.target.value)} 
-                    placeholder="Type a message..." 
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
                 />
-                <button onClick={handleSendMessage}>Send</button>
+                <button onClick={sendMessage}>Send</button>
             </div>
         </div>
     );
