@@ -38,6 +38,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [lineWidth, setLineWidth] = useState(2);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const historyRef = useRef<ImageData[]>([]);
   const { auth } = useAuth();
   const userInState = auth?.user;
@@ -80,10 +81,22 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const oldContent = currentContent;
     const newContent = e.target.value;
-    const diff = newContent.replace(oldContent, '');
+    const caretPosition = textareaRef.current?.selectionEnd;
+    let diff: string = ''
+    if (newContent.length < oldContent.length){
+      socket.emit(`document_change`, { id: docId, diff: null, index: caretPosition!, mouseData: null, type: docType });
+    }
+    else if (newContent.length === oldContent.length){
+      diff = newContent[caretPosition!-1];
+      socket.emit(`document_change`, { id: docId, diff: diff, index: caretPosition!-1, mouseData: null, type: docType });
+    }
+    else {
+      diff = newContent[caretPosition!-1];
+      socket.emit(`document_change`, { id: docId, diff: diff, index: caretPosition!-1, mouseData: null, type: docType });
+    }
+    
     console.log(newContent);
     console.log(diff);
-    socket.emit(`document_change`, { id: docId, diff: diff, mouseData: null, type: docType });
     setCurrentContent(newContent);
   };
 
@@ -265,6 +278,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
           {docType === DocumentType.DOCUMENT && (
             <textarea
               value={currentContent}
+              ref={textareaRef}
               onChange={handleContentChange}
               placeholder="Type your text here..."
             />
