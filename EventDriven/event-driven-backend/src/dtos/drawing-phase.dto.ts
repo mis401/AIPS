@@ -6,4 +6,3 @@ export interface DrawingPhaseDTO {
     color: string;
     lineWidth: number
 }
-}

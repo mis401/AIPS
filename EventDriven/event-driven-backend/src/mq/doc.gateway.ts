@@ -24,8 +24,10 @@ import { LineCfgDTO } from 'src/dtos/linecfg.dto';
   export class DocumentGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleInit {
     @WebSocketServer()
     server: Server;
-  
-    constructor(private rabbitMQService: RabbitMQService) {}
+    roomOwners: Map<string, string>;
+    constructor(private rabbitMQService: RabbitMQService) {
+      this.roomOwners = new Map<string, string>();
+    }
   
     async onModuleInit() {
       await this.rabbitMQService.onModuleInit();
@@ -53,11 +55,25 @@ import { LineCfgDTO } from 'src/dtos/linecfg.dto';
       client.join(id.toString());
       
       console.log("Client joined room for doc id "+id);
-      console.log((await this.server.in(id.toString()).fetchSockets()).length);
+      const numberOfPeople = (await this.server.in(id.toString()).fetchSockets()).length;
+      console.log(numberOfPeople);
+      if (numberOfPeople == 1) {
+        this.roomOwners.set(client.id, id.toString());
+      }
+      this.server.to(client.id).emit("ownership", this.roomOwners.has(client.id));
     }
 
     @SubscribeMessage(`unregister`)
     async handleUnregister(@ConnectedSocket() client: Socket, @MessageBody() id: number){
+      if (this.roomOwners.has(client.id)){
+        const allRoomSockets = await this.server.in(id.toString()).fetchSockets();
+        const guests = allRoomSockets.filter(s => s.id != client.id);
+        this.roomOwners.delete(client.id);
+        if (guests.length > 0) {
+          this.roomOwners.set(guests.at(0).id, id.toString());
+          this.server.to(guests.at(0).id).emit("ownership", true);
+        }
+      }
       client.leave(id.toString());
       console.log("Client unregistered from doc id "+id);
       console.log((await this.server.in(id.toString()).fetchSockets()).length);
@@ -66,13 +82,15 @@ import { LineCfgDTO } from 'src/dtos/linecfg.dto';
     @SubscribeMessage(`drawing_start`)
     handleDrawingStart(@ConnectedSocket() client: Socket, @MessageBody() data: DrawingPhaseDTO) {
       console.log(data);
-      client.broadcast.to(data.id.toString()).emit(`drawing_started`, data)
+      if (this.roomOwners.has(client.id))
+        client.broadcast.to(data.id.toString()).emit(`drawing_started`, data)
     }
 
     @SubscribeMessage(`linecfg`)
     handleLineCfg(@ConnectedSocket() client: Socket, @MessageBody() data: LineCfgDTO){
       console.log(data);
-      client.broadcast.to(data.id.toString()).emit(`linecfg-update`, data);
+      if (this.roomOwners.has(client.id))
+        client.broadcast.to(data.id.toString()).emit(`linecfg-update`, data);
     }
 
     @SubscribeMessage(`document_change`)
@@ -81,8 +99,10 @@ import { LineCfgDTO } from 'src/dtos/linecfg.dto';
       @ConnectedSocket() client: Socket,
     ) {
       console.log(data);
-      this.rabbitMQService.sendToQueue('document_changes', JSON.stringify(data));
-      client.broadcast.to(data.id.toString()).emit(`document_changed ${data.id}`, data);
+      if (this.roomOwners.has(client.id)){
+        this.rabbitMQService.sendToQueue('document_changes', JSON.stringify(data));
+        client.broadcast.to(data.id.toString()).emit(`document_changed ${data.id}`, data);
+      }
       console.log(client.rooms);
     }
   }

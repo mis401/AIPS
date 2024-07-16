@@ -40,6 +40,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   const [color, setColor] = useState('#000000');
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [lineWidth, setLineWidth] = useState(2);
+  const [owner, setOwner] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const historyRef = useRef<ImageData[]>([]);
@@ -51,6 +52,9 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       socket.connect();
       socket.emit('register', docId);
       if (!socket.hasListeners(`document_changed ${docId}`)) {
+        socket.on("ownership", (data: boolean) => {
+          setOwner(data);
+        })
         socket.on(`linecfg-update`, (data: LineCfgDTO) => {
           //console.log(data);
           setColor(color => data.color);
@@ -333,6 +337,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
         <div className="dialog-body">
           {docType === DocumentType.DOCUMENT && (
             <textarea
+              disabled={!owner}
               value={currentContent}
               ref={textareaRef}
               onChange={handleContentChange}
@@ -348,6 +353,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
                     className="todo-checkbox"
                   />
                   <input
+                    
                     type="text"
                     value={item}
                     onChange={(e) => handleTodoItemChange(index, e.target.value)}
@@ -361,6 +367,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
           {docType === DocumentType.WHITEBOARD && (
             <div className="whiteboard-container">
               <canvas
+                contentEditable={owner}
                 ref={canvasRef}
                 width={400}
                 height={300}
