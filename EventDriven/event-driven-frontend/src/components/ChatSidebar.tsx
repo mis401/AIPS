@@ -52,9 +52,11 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isChatSidebarOpen, communityI
 
                 if (response.ok) {
                     const data = await response.json();
+                    setMembers(data);
+                    console.log('Fetched members:', data);
                     setMembers(data.map((member: Member) => ({
                         ...member,
-                        status: 'offline', // default status
+                        status: 'offline', 
                     })));
                 } else {
                     const errorData = await response.json();
@@ -142,7 +144,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isChatSidebarOpen, communityI
                 communityId,
                 senderId: userInState?.id,
                 message: newMessage,
-                senderName: `${userInState?.firstName} ${userInState?.lastName}` // Dodaj senderName ovde
+                senderName: `${userInState?.firstName} ${userInState?.lastName}`
             };
     
             console.log("Sending message:", newMessage);
