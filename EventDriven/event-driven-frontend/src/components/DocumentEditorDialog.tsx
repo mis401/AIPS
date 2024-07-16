@@ -51,23 +51,27 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       socket.connect();
       socket.emit('register', docId);
       if (!socket.hasListeners(`document_changed ${docId}`)) {
+        socket.on(`linecfg-update`, (data: LineCfgDTO) => {
+          //console.log(data);
+          setColor(color => data.color);
+          setLineWidth(lw => data.lineWidth);
+          //console.log(color, lineWidth);
+        });
         socket.on(`drawing_started`, (data: DrawingPhaseDTO) => {
           const canvas = canvasRef.current;
               if (canvas) {
                 const rect = canvas.getBoundingClientRect();
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
+                  ctx.closePath();
                   console.log("draw start")
-                  console.log(color, lineWidth)
-                  ctx.strokeStyle=color;
-                  ctx.lineWidth=lineWidth;
-                  ctx.moveTo(data.x - rect.left, data.y - rect.top);
+                  //console.log(color, lineWidth)
+                  ctx.strokeStyle=data.color;
+                  ctx.lineWidth=data.lineWidth;
+                  ctx.moveTo(data.x, data.y);
+                  ctx.beginPath();
                 }
               }
-        });
-        socket.on(`linecfg-update`, (data: LineCfgDTO) => {
-          setColor(data.color);
-          setLineWidth(data.lineWidth);
         });
         socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
           if (data.id === docId) {
@@ -104,7 +108,8 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
                 const rect = canvas.getBoundingClientRect();
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
-                  ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
+                  ctx.lineTo(data.mouseData!.x, data.mouseData!.y);
+                  console.log("Drawing to: ", data.mouseData!.x, data.mouseData!.y)
                   ctx.stroke();
                   
                 }
@@ -190,7 +195,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
 
   useEffect(() => {
     socket.emit(`linecfg`, {id: docId, color, lineWidth})
-  }, [color, lineWidth])
+  }, [docId, color, lineWidth])
 
   const handleAddTodoItem = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Enter') {
@@ -231,7 +236,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
         ctx.strokeStyle = color;
         ctx.lineWidth = lineWidth;
         setIsDrawing(true);
-        socket.emit(`drawing_start`, {id: docId, x:e.clientX, y:e.clientY});
+        socket.emit(`drawing_start`, {id: docId, x:e.clientX - rect.left, y:e.clientY - rect.top, color, lineWidth});
       }
     }
   };
@@ -245,7 +250,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       if (ctx) {
         ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
         ctx.stroke();
-        socket.emit(`document_change`, {id: docId, diff: null, mouseData: {x:e.clientX, y: e.clientY}, type: docType})
+        socket.emit(`document_change`, {id: docId, diff: null, mouseData: {x:e.clientX - rect.left, y: e.clientY - rect.top}, type: docType})
       }
     }
   };
