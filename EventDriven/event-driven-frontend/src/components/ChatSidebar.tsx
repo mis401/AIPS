@@ -21,7 +21,13 @@ interface Message {
     senderName: string;
 }
 
-const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: boolean, communityId: number }) => {
+interface ChatSidebarProps {
+    isChatSidebarOpen: boolean;
+    communityId: number;
+    onClose: () => void;
+}
+
+const ChatSidebar: React.FC<ChatSidebarProps> = ({ isChatSidebarOpen, communityId, onClose }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [members, setMembers] = useState<MemberWithStatus[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -172,6 +178,9 @@ const ChatSidebar = ({ isChatSidebarOpen, communityId }: { isChatSidebarOpen: bo
                 <div className="chat-sidebar-title">
                     <h1>Chats</h1>
                 </div>
+                <button className="close-button" onClick={onClose}>
+                X 
+                </button>   
             </div>
 
             <div className="chat-sidebar-chats">

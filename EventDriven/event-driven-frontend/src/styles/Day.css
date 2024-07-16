@@ -28,3 +28,16 @@
     display: flex;
     justify-content: center;
 }
+
+.scrollable-documents{
+    overflow-y: auto;
+    max-height: calc(100vh / 9 * 0.75);
+}
+
+.scrollable-documents::-webkit-scrollbar {
+    width: 0;
+}
+
+.scrollable-documents::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}

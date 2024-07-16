@@ -46,6 +46,7 @@ function Home() {
                 <ChatSidebar 
                     isChatSidebarOpen={isChatSidebarOpen} 
                     communityId={selectedCommunityId} 
+                    onClose={toggleChatSidebar}
                 />
             )}
         </div>

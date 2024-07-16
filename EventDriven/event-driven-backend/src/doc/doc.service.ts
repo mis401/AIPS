@@ -1,9 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Community, DocumentType } from '@prisma/client';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { DocumentType } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FilesysService } from 'src/filesys/filesys.service';
-import { DiffDTO } from '../dtos/diff.dto';
 import { DocumentUpdate } from 'src/dtos/document-update.dto';
 
 @Injectable()
@@ -52,8 +51,6 @@ export class DocService {
                     path: documentPath
                 }
             });
-
-            //await this.filesys.saveDocumentContent(documentPath, newDoc.content);
 
             return doc;
         } catch (error) {
@@ -164,5 +161,28 @@ export class DocService {
         } catch (error) {
           throw new InternalServerErrorException(error.message);
         }
-      }
+    }
+
+    async deleteDocument(id: number) {
+        try {
+            const doc = await this.prisma.document.findUnique({
+                where: { id: Number(id) },
+            });
+
+            if (!doc) {
+                throw new NotFoundException('Document not found');
+            }
+
+            await this.filesys.deleteDocument(doc.path);
+
+            await this.prisma.document.delete({
+                where: { id : Number(id) },
+            });
+
+            return { message: 'Document deleted successfully' };
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
+
 }

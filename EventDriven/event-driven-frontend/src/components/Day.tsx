@@ -128,12 +128,14 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         <label className={`dayLabel ${day.isCurrentMonth ? '' : 'faded'}`}>
           {day.day !== 0 && day.day}
         </label>
-        <div className="documents">
-          {day.documents?.map((doc) => (
-            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id);}}>
-              {doc.name}
-            </div>
-          ))}
+        <div className='scrollable-documents'>
+          <div className="documents">
+            {day.documents?.map((doc) => (
+              <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id);}}>
+                {doc.name}
+              </div>
+            ))}
+          </  div>
         </div>
       </div>
 

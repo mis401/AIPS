@@ -1,4 +1,3 @@
-/* Add this to your CSS file */
 .sidebar {
   width: 250px;
   background-color: #2c3e50;
@@ -8,6 +7,8 @@
   padding-right: 20px;
   margin: 0;
   flex-shrink: 0;
+  display: grid;
+  grid-template-rows: 1fr 3fr 1fr; 
   position: relative;
 }
 
@@ -38,7 +39,8 @@
 
 .scrollable-communities {
   overflow-y: auto;
-  max-height: 330px;
+  display: flex;
+  flex-direction: column;
 }
 
 .scrollable-communities::-webkit-scrollbar {
@@ -64,7 +66,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  position: relative; /* Add this */
+  position: relative; 
 }
 
 .community-name {
@@ -73,9 +75,9 @@
 }
 
 .leave-button {
-  position: absolute; /* Add this */
-  right: 10px; /* Adjust this value to move the button left or right */
-  top: 10px; /* Adjust this value to move the button up or down */
+  position: absolute; 
+  right: 10px;
+  top: 10px; 
   background: transparent;
   border: none;
   cursor: pointer;
@@ -88,14 +90,14 @@
 }
 
 .add-community {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
+  padding: 10px;
   width: 150px;
   height: 150px;
   margin: 0 auto;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-community button {

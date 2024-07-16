@@ -43,10 +43,13 @@
 }
 
 .notification-window {
-    max-height: 300px; /* Postavi maksimalnu visinu prozora */
-    overflow-y: auto;  /* Omogući vertikalno scrollovanje */
+    max-height: 300px;
+    overflow-y: auto;  
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #fff;
+}
+.window {
+    z-index: 500;
 }

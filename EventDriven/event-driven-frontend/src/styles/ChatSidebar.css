@@ -19,6 +19,8 @@
     padding: 10px;
     background-color: #f5f5f5;
     border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
 }
 
 .chat-sidebar-title h1 {
