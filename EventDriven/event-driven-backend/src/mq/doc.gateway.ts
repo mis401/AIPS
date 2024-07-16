@@ -14,6 +14,8 @@ import {
   import { OnModuleInit } from '@nestjs/common';
 import { Client } from 'socket.io/dist/client';
 import { SocketDiffDTO } from 'src/dtos/socket-diff.dto';
+import { DrawingPhaseDTO } from 'src/dtos/drawing-phase.dto';
+import { LineCfgDTO } from 'src/dtos/linecfg.dto';
   
   @WebSocketGateway({cors: {
     origin: ['http://localhost:3000'],
@@ -59,6 +61,18 @@ import { SocketDiffDTO } from 'src/dtos/socket-diff.dto';
       client.leave(id.toString());
       console.log("Client unregistered from doc id "+id);
       console.log((await this.server.in(id.toString()).fetchSockets()).length);
+    }
+
+    @SubscribeMessage(`drawing_start`)
+    handleDrawingStart(@ConnectedSocket() client: Socket, @MessageBody() data: DrawingPhaseDTO) {
+      console.log(data);
+      client.broadcast.to(data.id.toString()).emit(`drawing_started`, data)
+    }
+
+    @SubscribeMessage(`linecfg`)
+    handleLineCfg(@ConnectedSocket() client: Socket, @MessageBody() data: LineCfgDTO){
+      console.log(data);
+      client.broadcast.to(data.id.toString()).emit(`linecfg-update`, data);
     }
 
     @SubscribeMessage(`document_change`)

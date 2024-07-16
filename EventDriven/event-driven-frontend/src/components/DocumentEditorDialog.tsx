@@ -11,6 +11,8 @@ import useAuth from '../hooks/useAuth';
 import { DiffDTO } from '../dtos/diff.dto';
 import { SocketDiffDTO } from '../dtos/socket-diff.dto';
 import { PermDeviceInformation } from '@mui/icons-material';
+import { DrawingPhaseDTO } from '../dtos/drawing-phase.dto';
+import { LineCfgDTO } from '../dtos/linecfg.dto';
 
 interface DocumentEditorDialogProps {
   open: boolean;
@@ -49,6 +51,24 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       socket.connect();
       socket.emit('register', docId);
       if (!socket.hasListeners(`document_changed ${docId}`)) {
+        socket.on(`drawing_started`, (data: DrawingPhaseDTO) => {
+          const canvas = canvasRef.current;
+              if (canvas) {
+                const rect = canvas.getBoundingClientRect();
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  console.log("draw start")
+                  console.log(color, lineWidth)
+                  ctx.strokeStyle=color;
+                  ctx.lineWidth=lineWidth;
+                  ctx.moveTo(data.x - rect.left, data.y - rect.top);
+                }
+              }
+        });
+        socket.on(`linecfg-update`, (data: LineCfgDTO) => {
+          setColor(data.color);
+          setLineWidth(data.lineWidth);
+        });
         socket.on(`document_changed ${docId}`, (data: SocketDiffDTO) => {
           if (data.id === docId) {
             if (docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) {
@@ -86,6 +106,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
                 if (ctx) {
                   ctx.lineTo(data.mouseData!.x - rect.left, data.mouseData!.y - rect.top);
                   ctx.stroke();
+                  
                 }
               }
             }
@@ -167,6 +188,10 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     }
   }, [docType, content, currentContent]);
 
+  useEffect(() => {
+    socket.emit(`linecfg`, {id: docId, color, lineWidth})
+  }, [color, lineWidth])
+
   const handleAddTodoItem = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -206,6 +231,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
         ctx.strokeStyle = color;
         ctx.lineWidth = lineWidth;
         setIsDrawing(true);
+        socket.emit(`drawing_start`, {id: docId, x:e.clientX, y:e.clientY});
       }
     }
   };
