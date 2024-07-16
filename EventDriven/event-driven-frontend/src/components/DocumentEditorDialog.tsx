@@ -353,7 +353,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
                     className="todo-checkbox"
                   />
                   <input
-                    
+                    disabled={!owner}
                     type="text"
                     value={item}
                     onChange={(e) => handleTodoItemChange(index, e.target.value)}
