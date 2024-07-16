@@ -21,6 +21,7 @@ interface DocumentEditorDialogProps {
   docId?: number;
   content?: string;
   type?: DocumentType;
+  ownerProp?: boolean
 }
 
 const socket = io('http://localhost:8000', {autoConnect: false});
@@ -30,6 +31,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   onClose,
   onSave,
   docId,
+  ownerProp,
   content = '',
   type = DocumentType.DOCUMENT,
 }) => {
@@ -48,6 +50,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   const userInState = auth?.user;
 
   useEffect(() => {
+    console.log(docId);
     if (docId) {
       socket.connect();
       socket.emit('register', docId);
@@ -121,6 +124,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
             }
           }
         });
+        console.log("Listeners attached, socket connected? ", socket.connected, socket.listeners);
       }
     }
 
@@ -177,6 +181,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       setTodoItems([]);
     }
   }, [docId]);
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -301,6 +306,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
     socket.disconnect();
     socket.offAny();
     console.log(docId);
+    docId=0;
     onClose();
   }
 
@@ -337,7 +343,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
         <div className="dialog-body">
           {docType === DocumentType.DOCUMENT && (
             <textarea
-              disabled={!owner}
+              disabled={!owner && !ownerProp}
               value={currentContent}
               ref={textareaRef}
               onChange={handleContentChange}
@@ -353,7 +359,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
                     className="todo-checkbox"
                   />
                   <input
-                    disabled={!owner}
+                    disabled={!owner && !ownerProp}
                     type="text"
                     value={item}
                     onChange={(e) => handleTodoItemChange(index, e.target.value)}
@@ -367,7 +373,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
           {docType === DocumentType.WHITEBOARD && (
             <div className="whiteboard-container">
               <canvas
-                contentEditable={owner}
+                contentEditable={owner || ownerProp}
                 ref={canvasRef}
                 width={400}
                 height={300}

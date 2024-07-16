@@ -62,7 +62,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
 
   const handleCreateDocument = (documentName: string) => {
     if (currentDocument) {
-      const formattedDate = new Date(day.year, day.month, day.day + 1).toISOString();
+      const formattedDate = new Date(day.year, day.month, day.day).toISOString();
       const newDocument: NewDocumentDTO = {
         name: documentName,
         day: formattedDate,
@@ -143,6 +143,7 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
 
       <DocumentEditorDialog
         open={openEditor}
+        ownerProp={true}
         onClose={() => {
           
           setOpenEditor(false);

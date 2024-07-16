@@ -40,9 +40,9 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
     setYear(today.getFullYear());
   }, []);
 
-  useEffect(() => {
-    console.log(currentDocument);
-  })
+  // useEffect(() => {
+  //   console.log(currentDocument);
+  // })
 
   useEffect(() => {
     
