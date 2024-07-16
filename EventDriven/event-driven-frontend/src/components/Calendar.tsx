@@ -57,7 +57,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
         const docsByDay: { [key: string]: { id: number; name: string; type: DocumentType }[] } = {};
         docs.forEach((doc: { id: number; name: string; day: string; type: DocumentType }) => {
           const day = new Date(doc.day).getDate();
-          const key = `${year}-${month}-${day}`;
+          const key = `${year}-${month}-${day-1}`;
           if (!docsByDay[key]) {
             docsByDay[key] = [];
           }

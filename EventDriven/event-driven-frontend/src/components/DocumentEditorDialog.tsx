@@ -56,6 +56,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
       socket.emit('register', docId);
       if (!socket.hasListeners(`document_changed ${docId}`)) {
         socket.on("ownership", (data: boolean) => {
+          console.log("Ownership call")
           setOwner(data);
         })
         socket.on(`linecfg-update`, (data: LineCfgDTO) => {
@@ -222,6 +223,10 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   };
 
   const handleDocTypeChange = (type: DocumentType) => {
+    if (docType === DocumentType.WHITEBOARD)
+      return;
+    if ((docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) && type === DocumentType.WHITEBOARD)
+      return;
     if (docType === DocumentType.TODO && type !== DocumentType.TODO) {
       setCurrentContent(todoItems.join('\n'));
     } else if (type === DocumentType.TODO) {
@@ -303,6 +308,7 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
   };
 
   const handleClose = () => {
+    socket.emit(`unregister`, docId);
     socket.disconnect();
     socket.offAny();
     console.log(docId);

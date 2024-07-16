@@ -21,7 +21,7 @@ export class DocService {
             const path: string = `/${community.name}/${newDoc.name}`;
             let documentPath = null;
             const oldDay = newDoc.day;
-            newDoc.day = newDoc.day.slice(0, 9);
+            newDoc.day = newDoc.day.slice(0, 10);
             switch(newDoc.type) {
                 case DocumentType.DOCUMENT:
                     documentPath = await this.filesys.generateTextDocument(newDoc, user, community);
