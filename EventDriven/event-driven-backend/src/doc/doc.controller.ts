@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Post, Put, Query, Req, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Put, Query, Req, ValidationPipe } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { NewDocumentDTO } from 'src/dtos/new-document.dto';
 import { FullDocument } from 'src/dtos/document.interface';
@@ -63,5 +63,8 @@ export class DocController {
       return await this.DocService.updateDocument(newContent);
     }
 
-    
+    @Delete('delete')
+    async deleteDocument(@Query('id') id: number) {
+        return await this.DocService.deleteDocument(id);
+    }
 }

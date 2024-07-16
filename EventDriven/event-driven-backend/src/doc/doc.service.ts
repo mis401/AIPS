@@ -164,5 +164,27 @@ export class DocService {
         } catch (error) {
           throw new InternalServerErrorException(error.message);
         }
-      }
+    }
+
+    async deleteDocument(id: number) {
+        try {
+            const doc = await this.prisma.document.findUnique({
+                where: { id: Number(id) },
+            });
+
+            if (!doc) {
+                throw new NotFoundException('Document not found');
+            }
+
+            await this.filesys.deleteDocument(doc.path);
+
+            await this.prisma.document.delete({
+                where: { id : Number(id) },
+            });
+
+            return { message: 'Document deleted successfully' };
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
 }

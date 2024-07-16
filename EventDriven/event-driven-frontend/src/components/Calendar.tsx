@@ -216,7 +216,7 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
       <div className="calendar">
         <div className="header">
           <div>
-            <label>{communityName || 'Ime zajednice'}</label>
+            <label className="comm-name">{communityName || 'Ime zajednice'}</label>
           </div>
 
           <div className="monthChangerDiv">
@@ -246,6 +246,9 @@ const Calendar: React.FC<CalendarProps> = ({ communityName, communityId }) => {
               ))}
             </div>
           ))}
+        </div>
+        <div className="footer">
+          Developed by Event Driven Team.
         </div>
       </div>
 

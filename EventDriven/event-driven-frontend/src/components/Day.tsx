@@ -6,6 +6,7 @@ import useAuth from '../hooks/useAuth';
 import DayAddDialog from './DayAddDialog';
 import { DocumentType, NewDocumentDTO } from '../dtos/NewDocument';
 import { DiffDTO } from '../dtos/diff.dto';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 
 interface DayProps {
   day: DayObject;
@@ -20,6 +21,10 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
   const [openEditor, setOpenEditor] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [currentDocument, setCurrentDocument] = useState<{ id?: number; content: string; type: DocumentType } | null>(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<{ id: number; name: string } | null>(null);
+
   
   const { auth } = useAuth();
   const userInState = auth?.user;
@@ -119,6 +124,52 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
   //   }
   // };
 
+  // const deleteDocument = async (documentId: number) => {
+  //   try {
+  //     const response = await fetch(`http://localhost:8000/doc/delete?id=${documentId}`, {
+  //       method: 'DELETE',
+  //     });
+  //     if (response.ok) {
+  //       console.log('Document deleted successfully');
+  //     } else {
+  //       console.error('Failed to delete the document');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deleting the document:', error);
+  //   }
+  // };
+
+  const confirmDeleteDocument = async () => {
+    if (documentToDelete) {
+      try {
+        const response = await fetch(`http://localhost:8000/doc/delete?id=${documentToDelete.id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          console.log('Document deleted successfully');
+          setDeleteDialogOpen(false);
+        } else {
+          console.error('Failed to delete the document');
+        }
+      } catch (error) {
+        console.error('Error deleting the document:', error);
+      }
+    }
+  };
+
+  const handleDeleteDocument = (docId: number, docName: string) => {
+    setDocumentToDelete({ id: docId, name: docName });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = (confirm: boolean) => {
+    if (confirm) {
+      confirmDeleteDocument();
+    } else {
+      setDeleteDialogOpen(false);
+    }
+  };
+
   return (
     <div
       className={`day ${day.day === 0 ? 'empty' : ''} ${isSelected ? 'selected' : ''} ${isCurrentDay ? 'currentDay' : ''}`}
@@ -128,12 +179,17 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         <label className={`dayLabel ${day.isCurrentMonth ? '' : 'faded'}`}>
           {day.day !== 0 && day.day}
         </label>
-        <div className="documents">
-          {day.documents?.map((doc) => (
-            <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id);}}>
-              {doc.name}
-            </div>
-          ))}
+        <div className='scrollable-documents'>
+          <div className="documents">
+            {day.documents?.map((doc) => (
+              <div key={doc.id} className={`document ${doc.type.toLowerCase()}`} onClick={() => { onDocumentClick(doc.id);}}>
+                {doc.name}
+                <button className="delete-button" onClick={(e) => {e.stopPropagation(); handleDeleteDocument(doc.id, doc.name);}}>
+                  x
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -156,6 +212,14 @@ const Day: React.FC<DayProps> = ({ day, isSelected, isCurrentDay, onDateClick, c
         onCreateButtonClick={handleCreateDocument}
         title="Create a new document"
       />
+
+      {documentToDelete && (
+        <DeleteConfirmationDialog
+          open={deleteDialogOpen}
+          onClose={handleCloseDeleteDialog}
+          documentName={documentToDelete.name}
+        />
+      )}
     </div>
   );
 };

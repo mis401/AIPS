@@ -28,3 +28,40 @@
     display: flex;
     justify-content: center;
 }
+
+.scrollable-documents {
+    overflow-y: auto;
+    max-height: calc(100vh / 9 * 0.75);
+}
+
+.scrollable-documents::-webkit-scrollbar {
+    width: 0;
+}
+
+.scrollable-documents::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+.document {
+    position: relative;
+    z-index: 1;
+}
+
+.document:hover .delete-button {
+    display: block;
+}
+
+.delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.document-editor-dialog, .day-add-dialog {
+    z-index: 1000;
+}

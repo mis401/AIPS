@@ -138,4 +138,13 @@ export class FilesysService {
             return null;
         }
     }
+
+    async deleteDocument(docPath: string) {
+        try {
+            await fs.remove(docPath);
+        } catch (e) {
+            console.log(e.message);
+            throw e;
+        }
+    }
 }

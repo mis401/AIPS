@@ -139,7 +139,7 @@ function IconsBar({ toggleChatSidebar, isChatSidebarOpen }: { toggleChatSidebar:
             )}
 
             {isNotificationWindowOpen && (
-                <Window onClose={closeNotificationWindow} top={50}>
+                <Window onClose={closeNotificationWindow} top={150}>
                     <div className="notification-window">
                         <h3>Notifications</h3>
                         <ul>

@@ -103,3 +103,24 @@
 .document.whiteboard {
   background-color: rgb(243, 141, 204);
 }
+
+.document:hover{
+  cursor:pointer;
+}
+
+.comm-name{
+  background-color: #a4e0fb;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 10px 0;
+  color: gray;
+  font-style: italic;
+  font-size: 14px; /* Adjust the size if needed */
+  z-index: 1000; /* Ensures the footer stays on top of other content */
+}

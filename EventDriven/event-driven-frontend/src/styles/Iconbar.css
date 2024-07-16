@@ -50,3 +50,6 @@
     border-radius: 5px;
     background-color: #fff;
 }
+.window {
+    z-index: 500;
+}
