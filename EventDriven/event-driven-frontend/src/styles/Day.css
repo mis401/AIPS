@@ -41,3 +41,27 @@
 .scrollable-documents::-webkit-scrollbar-thumb {
     background-color: transparent;
 }
+
+.document {
+    z-index: 1;
+    position: relative;
+  }
+  
+  .document:hover .delete-button {
+    display: block;
+  }
+  
+  .delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+  }
+  
+  .document-editor-dialog, .day-add-dialog {
+    z-index: 1000; 
+  }
