@@ -10,6 +10,7 @@ import { io } from 'socket.io-client';
 import useAuth from '../hooks/useAuth';
 import { DiffDTO } from '../dtos/diff.dto';
 import { SocketDiffDTO } from '../dtos/socket-diff.dto';
+import { PermDeviceInformation } from '@mui/icons-material';
 
 interface DocumentEditorDialogProps {
   open: boolean;
@@ -52,7 +53,31 @@ const DocumentEditorDialog: React.FC<DocumentEditorDialogProps> = ({
           if (data.id === docId) {
             if (docType === DocumentType.DOCUMENT || docType === DocumentType.TODO) {
               console.log(data);
-              setCurrentContent(prevContent => prevContent + data.diff);
+              if (data.diff == null && data.index != null) {
+                setCurrentContent(prevContent => {
+                  const firstSlice = prevContent.slice(0, data.index) ? prevContent.slice(0, data.index) : '';
+                  const secondSlice = prevContent.slice(data.index+1) ? prevContent.slice(data.index+1) : '';
+                  console.log(firstSlice);
+                  console.log(secondSlice);
+                  if(firstSlice+secondSlice)
+                    return firstSlice+secondSlice;
+                  else
+                    return ''})
+              }
+              else if(data.diff != null && data.index != null){
+                setCurrentContent(prevContent => {
+                  const array = prevContent.split('');
+                  console.log(array);
+                  const spliced = array.splice(data.index, 1, data.diff!);
+                  console.log(spliced);
+                  const joined = array.join('');
+                  console.log(joined);
+                  return joined;
+                });
+              }
+              else {
+                setCurrentContent(prevContent => prevContent + data.diff);
+              }
             } else if (docType === DocumentType.WHITEBOARD) {
               const canvas = canvasRef.current;
               if (canvas) {
